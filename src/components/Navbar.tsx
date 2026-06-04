@@ -16,14 +16,14 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop top bar */}
-      <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-white/5 bg-[#07070f]/90 backdrop-blur-md sticky top-0 z-50">
+      <header className="hidden md:flex items-center justify-between px-8 border-b border-white/5 bg-black sticky top-0 z-50" style={{ minHeight: 60 }}>
         <Link href="/" className="flex items-center">
           <Image
             src="/vybz-logo.png"
             alt="VYBZ"
-            height={56}
-            width={56}
-            className="h-14 w-auto"
+            height={60}
+            width={60}
+            className="h-[60px] w-auto"
             priority
           />
         </Link>
