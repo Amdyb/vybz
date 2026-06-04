@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const navLinks = [
@@ -16,9 +17,15 @@ export default function Navbar() {
     <>
       {/* Desktop top bar */}
       <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-white/5 bg-[#07070f]/90 backdrop-blur-md sticky top-0 z-50">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl font-black gradient-text tracking-tight">VYBZ</span>
-          <span className="text-xs text-white/30 font-medium mt-1">DAKAR</span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/assets/logos/vybz-neon-logo.png"
+            alt="VYBZ"
+            height={40}
+            width={120}
+            style={{ height: 40, width: 'auto' }}
+            priority
+          />
         </Link>
         <nav className="flex items-center gap-1">
           {navLinks.map(({ href, label }) => (
