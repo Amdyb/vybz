@@ -22,8 +22,8 @@ export default function Navbar() {
             src="/vybz-logo.png"
             alt="VYBZ"
             height={40}
-            width={120}
-            style={{ height: 40, width: 'auto' }}
+            width={40}
+            className="h-10 w-auto"
             priority
           />
         </Link>
