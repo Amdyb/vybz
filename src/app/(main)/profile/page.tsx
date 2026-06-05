@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
   MapPin, Ticket, Heart, Settings, LogOut,
-  ChevronRight, Trophy, Loader2,
+  ChevronRight, Trophy, Loader2, Zap,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/lib/types'
@@ -204,6 +204,15 @@ export default function ProfilePage() {
               ? `Encore ${(tier.nextAt - points).toLocaleString('fr-FR')} pts pour passer ${tier.next}`
               : 'Niveau maximum atteint — bienvenue chez les Diamond !'}
           </p>
+
+          <Link
+            href="/profile/pulse-points"
+            className="mt-4 flex items-center justify-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 font-semibold transition-colors"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            Voir le détail de mes points
+            <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
         {/* ── Stats row ─────────────────────────────────────────────── */}
@@ -225,9 +234,10 @@ export default function ProfilePage() {
 
         {/* ── Action buttons ────────────────────────────────────────── */}
         <div className="space-y-2">
-          <ActionLink href="/tickets"   icon={<Ticket   className="w-5 h-5" />} label="Mes Billets" />
-          <ActionLink href="/favorites" icon={<Heart    className="w-5 h-5" />} label="Mes Favoris" />
-          <ActionLink href="/settings"  icon={<Settings className="w-5 h-5" />} label="Paramètres" />
+          <ActionLink href="/profile/pulse-points" icon={<Zap     className="w-5 h-5" />} label="Pulse Points" />
+          <ActionLink href="/tickets"              icon={<Ticket  className="w-5 h-5" />} label="Mes Billets" />
+          <ActionLink href="/favorites"            icon={<Heart   className="w-5 h-5" />} label="Mes Favoris" />
+          <ActionLink href="/settings"             icon={<Settings className="w-5 h-5" />} label="Paramètres" />
 
           <button
             onClick={handleSignOut}

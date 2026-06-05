@@ -9,6 +9,7 @@ export type Database = {
       ticket_types: { Row: TicketType }
       orders:       { Row: Order }
       tickets:      { Row: Ticket }
+      pulse_points_transactions: { Row: PulsePointsTransaction }
     }
   }
 }
@@ -132,6 +133,15 @@ export type Ticket = {
   scanned_at: string | null
   scanned_by: string | null
   created_at: string | null
+}
+
+export type PulsePointsTransaction = {
+  id: string
+  user_id: string
+  points: number
+  action: string
+  description: string | null
+  created_at: string
 }
 
 // ─── Joined types ──────────────────────────────────────────────────────────────
