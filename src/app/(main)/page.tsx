@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import EventCard from '@/components/EventCard'
@@ -82,10 +83,24 @@ export default async function HomePage() {
           </div>
           <Link href={`/events/${featured.id}`} className="group block">
             <div className="relative rounded-3xl overflow-hidden h-56 md:h-72 bg-gradient-to-br from-violet-900 via-purple-900 to-rose-900 border border-violet-500/20 shadow-[0_0_40px_rgba(124,58,237,0.2)]">
+              {featured.cover_image && (
+                <Image
+                  src={featured.cover_image}
+                  alt={featured.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  priority
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              {/* Decorative orbs */}
-              <div className="absolute top-8 right-8 w-48 h-48 bg-violet-600/20 rounded-full blur-3xl" />
-              <div className="absolute bottom-4 left-4 w-32 h-32 bg-rose-600/20 rounded-full blur-2xl" />
+              {/* Decorative orbs — only when no image */}
+              {!featured.cover_image && (
+                <>
+                  <div className="absolute top-8 right-8 w-48 h-48 bg-violet-600/20 rounded-full blur-3xl" />
+                  <div className="absolute bottom-4 left-4 w-32 h-32 bg-rose-600/20 rounded-full blur-2xl" />
+                </>
+              )}
 
               <div className="absolute bottom-0 left-0 right-0 p-6">
                 <div className="flex items-center gap-2 mb-2">
