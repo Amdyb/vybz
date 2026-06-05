@@ -21,7 +21,7 @@ export default function EventsPage() {
         .eq('status', 'published')
         .gte('event_date', today)
         .order('event_date', { ascending: true })
-        .limit(50)
+        .limit(200)
 
       if (!data) { setLoading(false); return }
 

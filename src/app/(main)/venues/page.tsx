@@ -9,6 +9,7 @@ export default async function VenuesPage() {
     .from('venues')
     .select('*')
     .order('name', { ascending: true })
+    .limit(200)
 
   const venues = (data as Venue[]) ?? []
 
