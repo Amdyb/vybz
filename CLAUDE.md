@@ -105,15 +105,59 @@ VYBZ only provides the platform — never touches ticket money.
 - The Morning After — rate event next day, earn points
 
 ## PULSE POINTS SYSTEM
-- Check in at event: +10 points
-- Post a photo: +5 points
-- Bring a friend: +20 points
-- Buy a ticket: +15 points
-- Leave a review: +8 points
-- Tiers:
-  - Neon: 0-500 points
-  - Gold: 500-2000 points
-  - Diamond: 2000+ points (real VIP perks)
+
+### WAYS TO EARN POINTS
+
+**Discovery**
+- Open app daily: +2
+- View event page: +1
+- Save to favorites: +5
+- Share an event: +10
+- Follow an organizer: +5
+
+**Social**
+- Check in at event: +20
+- Post a photo: +15
+- Tag a friend: +10
+- Leave a review: +12
+- Rate a venue: +8
+- Create a crew: +25
+- Invite a crew member: +15
+
+**Transactions**
+- Buy a ticket: +30
+- Make a reservation: +20
+- Refer friend who signs up: +50
+- Refer friend who buys a ticket: +100
+
+**Loyalty Bonuses**
+- Attend same venue 3 times: +30 bonus
+- Attend 5 events in one month: +50 bonus
+- Complete your profile: +20
+- Complete onboarding: +15
+- First ticket purchase ever: +50 bonus
+
+**Special**
+- Check in on your birthday: +100
+- Attend a featured event: +25
+- First check-in at any event: +30
+- VYBZ Drops purchase: +40
+
+### TIERS
+- Neon: 0–499 points
+- Gold: 500–1999 points
+- Diamond: 2000+ points
+
+### MILESTONES AND REWARDS
+- 100 pts — VYBZ Member badge
+- 250 pts — 10% discount on next ticket
+- 500 pts (Neon) — free drink voucher at partner venue
+- 750 pts — early access to VYBZ Drops
+- 1 000 pts — 1 free event entry of choice
+- 1 500 pts — VIP upgrade on next ticket
+- 2 000 pts (Gold) — 2 free tickets per month
+- 3 000 pts — personal VYBZ concierge
+- 5 000 pts (Diamond) — monthly VIP access + backstage passes
 
 ## UNIQUE FEATURES
 1. Vibe Meter — real-time crowd energy from check-ins (Dead/Warming Up/Lit/On Fire)
