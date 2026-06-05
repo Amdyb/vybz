@@ -34,6 +34,9 @@ export type Event = {
   status: string | null
   is_featured: boolean | null
   is_sponsored: boolean | null
+  payment_methods: string[] | null
+  whatsapp_contact: string | null
+  refund_policy: string | null
   created_at: string | null
 }
 
