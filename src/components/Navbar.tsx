@@ -1,17 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { User } from 'lucide-react'
+import { User, Map as MapIcon } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
-const navLinks = [
+const navLinks: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { href: '/',       label: 'Accueil',      icon: HomeIcon },
   { href: '/events', label: 'Événements',   icon: CalendarIcon },
   { href: '/venues', label: 'Lieux',        icon: MapPinIcon },
+  { href: '/map',    label: 'Carte',        icon: MapIcon },
 ]
 
 function getInitials(user: SupabaseUser): string {
