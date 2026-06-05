@@ -66,6 +66,10 @@ export type Profile = {
   city: string | null
   country: string | null
   language: string | null
+  role: string | null                  // 'user' | 'organizer' | 'admin'
+  business_name: string | null
+  subscription_plan: string | null     // 'basic' | 'pro' | 'premium'
+  is_verified_organizer: boolean | null
   created_at: string | null
 }
 
