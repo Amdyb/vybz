@@ -1,11 +1,14 @@
 export type Database = {
   public: {
     Tables: {
-      events: { Row: Event }
-      venues: { Row: Venue }
-      profiles: { Row: Profile }
-      favorites: { Row: Favorite }
-      reviews: { Row: Review }
+      events:       { Row: Event }
+      venues:       { Row: Venue }
+      profiles:     { Row: Profile }
+      favorites:    { Row: Favorite }
+      reviews:      { Row: Review }
+      ticket_types: { Row: TicketType }
+      orders:       { Row: Order }
+      tickets:      { Row: Ticket }
     }
   }
 }
@@ -82,4 +85,51 @@ export type Review = {
   created_at: string | null
 }
 
+export type TicketType = {
+  id: string
+  event_id: string | null
+  name: string
+  price: number
+  currency: string | null
+  quantity: number
+  quantity_sold: number | null
+  sale_start: string | null
+  sale_end: string | null
+  max_per_buyer: number | null
+  created_at: string | null
+}
+
+export type Order = {
+  id: string
+  user_id: string | null
+  event_id: string | null
+  ticket_type_id: string | null
+  quantity: number
+  total_amount: number
+  currency: string | null
+  status: string | null
+  payment_method: string | null
+  created_at: string | null
+}
+
+export type Ticket = {
+  id: string
+  order_id: string | null
+  event_id: string | null
+  user_id: string | null
+  ticket_type_id: string | null
+  qr_token: string
+  status: string | null
+  scanned_at: string | null
+  scanned_by: string | null
+  created_at: string | null
+}
+
+// ─── Joined types ──────────────────────────────────────────────────────────────
+
 export type EventWithVenue = Event & { venues: Venue | null }
+
+export type TicketWithDetails = Ticket & {
+  events: (Event & { venues: Pick<Venue, 'name' | 'city' | 'address'> | null }) | null
+  ticket_types: Pick<TicketType, 'name' | 'price' | 'currency'> | null
+}
