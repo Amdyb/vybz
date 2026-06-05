@@ -59,6 +59,7 @@ export type Venue = {
   review_count: number | null
   is_verified: boolean | null
   is_sponsored: boolean | null
+  slug: string | null
   created_at: string | null
 }
 
@@ -80,6 +81,7 @@ export type Favorite = {
   id: string
   user_id: string | null
   event_id: string | null
+  venue_id: string | null
   created_at: string | null
 }
 
