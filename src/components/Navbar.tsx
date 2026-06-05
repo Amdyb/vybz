@@ -1,17 +1,51 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { User } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 const navLinks = [
-  { href: '/',        label: 'Accueil', icon: HomeIcon },
-  { href: '/events',  label: 'Événements', icon: CalendarIcon },
-  { href: '/venues',  label: 'Lieux', icon: MapPinIcon },
+  { href: '/',       label: 'Accueil',      icon: HomeIcon },
+  { href: '/events', label: 'Événements',   icon: CalendarIcon },
+  { href: '/venues', label: 'Lieux',        icon: MapPinIcon },
 ]
+
+function getInitials(user: SupabaseUser): string {
+  const name =
+    (user.user_metadata?.full_name as string | undefined) ||
+    user.email?.split('@')[0] ||
+    '?'
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .map((w: string) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+}
 
 export default function Navbar() {
   const pathname = usePathname()
+  const [user, setUser] = useState<SupabaseUser | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const profileHref = user ? '/profile' : '/sign-in'
+  const profileActive = pathname === '/profile'
 
   return (
     <>
@@ -27,7 +61,8 @@ export default function Navbar() {
             priority
           />
         </Link>
-        <nav className="flex items-center gap-1">
+
+        <div className="flex items-center gap-1">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
@@ -41,7 +76,24 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
-        </nav>
+
+          {/* Avatar — desktop */}
+          <Link
+            href={profileHref}
+            className="ml-3 flex items-center justify-center w-9 h-9 rounded-full transition-all hover:opacity-80 active:scale-95"
+            title={user ? 'Mon profil' : 'Se connecter'}
+          >
+            {user ? (
+              <span className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white text-xs font-black select-none">
+                {getInitials(user)}
+              </span>
+            ) : (
+              <span className="w-9 h-9 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/40 hover:text-white/70 hover:border-white/20 transition-all">
+                <User className="w-4 h-4" />
+              </span>
+            )}
+          </Link>
+        </div>
       </header>
 
       {/* Mobile bottom nav */}
@@ -62,6 +114,29 @@ export default function Navbar() {
               </Link>
             )
           })}
+
+          {/* Profile tab — mobile */}
+          <Link
+            href={profileHref}
+            className={`flex flex-col items-center gap-1 px-4 py-1 rounded-xl transition-all ${
+              profileActive ? 'text-violet-400' : 'text-white/40'
+            }`}
+          >
+            {user ? (
+              <span
+                className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black select-none ${
+                  profileActive
+                    ? 'bg-gradient-to-br from-purple-500 to-cyan-400 text-white'
+                    : 'bg-gradient-to-br from-purple-600/70 to-cyan-500/70 text-white'
+                }`}
+              >
+                {getInitials(user)}
+              </span>
+            ) : (
+              <User className={`w-5 h-5 ${profileActive ? 'text-violet-400' : 'text-white/40'}`} />
+            )}
+            <span className="text-[10px] font-medium">Profil</span>
+          </Link>
         </div>
       </nav>
     </>
