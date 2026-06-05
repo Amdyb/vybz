@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Venue } from '@/lib/types'
 import { VENUE_CATEGORY_COLORS } from '@/lib/utils'
@@ -17,10 +18,19 @@ export default function VenueCard({ venue }: { venue: Venue }) {
   return (
     <Link href={`/venues/${venue.id}`} className="group block">
       <div className="rounded-2xl overflow-hidden bg-[#0f0f1a] border border-white/[0.06] hover:border-violet-500/30 transition-all duration-300 hover:shadow-[0_0_30px_rgba(124,58,237,0.15)] hover:-translate-y-0.5">
-        <div className={`relative h-36 bg-gradient-to-br ${gradient} flex items-end p-4`}>
+        <div className={`relative h-36 flex items-end p-4 ${venue.cover_image ? 'bg-black' : `bg-gradient-to-br ${gradient}`}`}>
+          {venue.cover_image && (
+            <Image
+              src={venue.cover_image}
+              alt={venue.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
           {venue.is_verified && (
-            <div className="absolute top-3 right-3 bg-violet-600/80 backdrop-blur-sm rounded-full p-1" title="Vérifié">
+            <div className="absolute top-3 right-3 z-10 bg-violet-600/80 backdrop-blur-sm rounded-full p-1" title="Vérifié">
               <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -54,13 +55,25 @@ export default async function VenueDetailPage({ params }: { params: { id: string
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <div className={`relative h-56 md:h-72 bg-gradient-to-br ${gradient} overflow-hidden`}>
+      <div className={`relative h-56 md:h-72 overflow-hidden ${venue.cover_image ? 'bg-black' : `bg-gradient-to-br ${gradient}`}`}>
+        {venue.cover_image && (
+          <Image
+            src={venue.cover_image}
+            alt={venue.name}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#07070f] via-black/20 to-transparent" />
-        <div className="absolute top-8 right-8 w-56 h-56 bg-white/5 rounded-full blur-3xl" />
+        {!venue.cover_image && (
+          <div className="absolute top-8 right-8 w-56 h-56 bg-white/5 rounded-full blur-3xl" />
+        )}
 
         <Link
           href="/venues"
-          className="absolute top-4 left-4 md:top-6 md:left-6 flex items-center gap-2 text-white/60 hover:text-white text-sm transition-colors bg-black/30 backdrop-blur-sm px-3 py-2 rounded-full"
+          className="absolute top-4 left-4 md:top-6 md:left-6 z-10 flex items-center gap-2 text-white/60 hover:text-white text-sm transition-colors bg-black/30 backdrop-blur-sm px-3 py-2 rounded-full"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -68,7 +81,7 @@ export default async function VenueDetailPage({ params }: { params: { id: string
           Retour
         </Link>
 
-        <div className="absolute bottom-6 left-4 right-4 md:left-8">
+        <div className="absolute bottom-6 left-4 right-4 md:left-8 z-10">
           <div className="flex items-center gap-2 mb-2">
             <span className={`text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${badgeClass}`}>
               {venue.category}
