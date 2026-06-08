@@ -10,6 +10,7 @@ export type Database = {
       orders:       { Row: Order }
       tickets:      { Row: Ticket }
       pulse_points_transactions: { Row: PulsePointsTransaction }
+      stories:      { Row: Story }
     }
   }
 }
@@ -142,6 +143,15 @@ export type PulsePointsTransaction = {
   action: string
   description: string | null
   created_at: string
+}
+
+export type Story = {
+  id: string
+  user_id: string
+  media_url: string
+  expires_at: string
+  created_at: string
+  views: string[]
 }
 
 // ─── Joined types ──────────────────────────────────────────────────────────────

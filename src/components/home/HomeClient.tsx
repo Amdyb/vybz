@@ -5,6 +5,7 @@ import type { EventWithVenue } from '@/lib/types'
 import CityHeader from './CityHeader'
 import HeroCarousel from './HeroCarousel'
 import CategoryRow from './CategoryRow'
+import StoriesRow from './StoriesRow'
 
 const CATEGORY_GROUPS = [
   {
@@ -162,6 +163,9 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
       <div className="md:hidden">
         <CityHeader />
       </div>
+
+      {/* Stories row — between header and feed */}
+      <StoriesRow />
 
       {/* Filter chips */}
       <div className="pt-4 pb-1">
