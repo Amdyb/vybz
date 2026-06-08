@@ -16,6 +16,8 @@ export type Database = {
       notifications:    { Row: Notification }
       activity_feed:    { Row: ActivityFeed }
       checkins:         { Row: CheckIn }
+      conversations:    { Row: Conversation }
+      messages:         { Row: Message }
     }
   }
 }
@@ -73,6 +75,8 @@ export type Venue = {
 export type Profile = {
   id: string
   full_name: string | null
+  username: string | null
+  bio: string | null
   avatar_url: string | null
   city: string | null
   country: string | null
@@ -81,6 +85,10 @@ export type Profile = {
   business_name: string | null
   subscription_plan: string | null     // 'basic' | 'pro' | 'premium'
   is_verified_organizer: boolean | null
+  favorite_categories: string[] | null
+  pulse_points: number | null
+  events_attended: number | null
+  reviews_count: number | null
   created_at: string | null
 }
 
@@ -147,6 +155,26 @@ export type PulsePointsTransaction = {
   points: number
   action: string
   description: string | null
+  created_at: string
+}
+
+export type Conversation = {
+  id: string
+  participant_1_id: string
+  participant_2_id: string
+  last_message: string | null
+  last_message_at: string | null
+  created_at: string
+}
+
+export type Message = {
+  id: string
+  conversation_id: string
+  sender_id: string
+  content: string
+  message_type: 'text' | 'image' | 'event_link' | 'venue_link' | 'ticket'
+  metadata: Record<string, string | number | boolean | null>
+  is_read: boolean
   created_at: string
 }
 
