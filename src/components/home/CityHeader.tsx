@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Bell, User, ChevronDown } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
+import NotificationBell from '@/components/NotificationBell'
 
 function getInitials(user: SupabaseUser): string {
   const name =
@@ -62,10 +63,13 @@ export default function CityHeader() {
       </div>
 
       <div className="flex items-center gap-2.5">
-        <button className="relative w-9 h-9 flex items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-          <Bell className="w-[18px] h-[18px] text-white/60" />
-          <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-fuchsia-500 rounded-full" />
-        </button>
+        {user ? (
+          <NotificationBell userId={user.id} />
+        ) : (
+          <button className="relative w-9 h-9 flex items-center justify-center rounded-full bg-white/5 border border-white/10">
+            <Bell className="w-[18px] h-[18px] text-white/60" />
+          </button>
+        )}
 
         <Link href={profileHref}>
           {user ? (

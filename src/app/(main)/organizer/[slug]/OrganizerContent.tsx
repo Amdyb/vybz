@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
   ShieldCheck, Star, MapPin, Phone, Globe, AtSign,
-  Share2, Heart, CalendarDays, Clock, ChevronRight,
-  CheckCircle2, Loader2,
+  Share2, CalendarDays, Clock, ChevronRight,
+  CheckCircle2,
 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import type { Venue, EventWithVenue } from '@/lib/types'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
+import FollowButton from '@/components/FollowButton'
 
 type Tab = 'events' | 'about'
 
@@ -81,42 +81,8 @@ interface Props {
 }
 
 export default function OrganizerContent({ venue, events }: Props) {
-  const [activeTab, setActiveTab]     = useState<Tab>('events')
-  const [userId, setUserId]           = useState<string | null>(null)
-  const [isFollowing, setIsFollowing] = useState(false)
-  const [followLoading, setFollowLoading] = useState(false)
-  const [shareToast, setShareToast]   = useState(false)
-
-  useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) return
-      setUserId(user.id)
-      const { data } = await supabase
-        .from('favorites')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('venue_id', venue.id)
-        .maybeSingle()
-      setIsFollowing(!!data)
-    })
-  }, [venue.id])
-
-  async function handleFollow() {
-    if (!userId) { window.location.href = '/sign-in'; return }
-    setFollowLoading(true)
-    if (isFollowing) {
-      await supabase.from('favorites')
-        .delete()
-        .eq('user_id', userId)
-        .eq('venue_id', venue.id)
-      setIsFollowing(false)
-    } else {
-      await supabase.from('favorites')
-        .insert({ user_id: userId, venue_id: venue.id } as never)
-      setIsFollowing(true)
-    }
-    setFollowLoading(false)
-  }
+  const [activeTab, setActiveTab] = useState<Tab>('events')
+  const [shareToast, setShareToast] = useState(false)
 
   function handleShare() {
     navigator.clipboard?.writeText(window.location.href).catch(() => {})
@@ -193,21 +159,8 @@ export default function OrganizerContent({ venue, events }: Props) {
             </div>
           </div>
 
-          {/* Follow button */}
-          <button
-            onClick={handleFollow}
-            disabled={followLoading}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold border transition-all shrink-0 active:scale-95 disabled:opacity-60 ${
-              isFollowing
-                ? 'bg-purple-600/20 border-purple-500/50 text-purple-300'
-                : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:border-purple-500/40 hover:text-white'
-            }`}
-          >
-            {followLoading
-              ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              : <Heart className={`w-3.5 h-3.5 ${isFollowing ? 'fill-purple-400 text-purple-400' : ''}`} />}
-            {isFollowing ? 'Suivi' : 'Suivre'}
-          </button>
+          {/* Follow button + follower count */}
+          <FollowButton followingId={venue.id} followingType="venue" showCount />
         </div>
 
         {/* Short description */}

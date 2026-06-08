@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { User, Map as MapIcon, Zap, Ticket } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
+import NotificationBell from '@/components/NotificationBell'
 
 const navLinks: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { href: '/',        label: 'Accueil', icon: HomeIcon },
@@ -91,6 +92,9 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
+
+          {/* Notification bell — desktop, logged in only */}
+          {user && <NotificationBell userId={user.id} />}
 
           {/* Pulse Points pill — desktop, logged in only */}
           {user && points !== null && (

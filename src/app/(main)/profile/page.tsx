@@ -6,11 +6,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
   MapPin, Ticket, Heart, Settings, LogOut,
-  ChevronRight, Trophy, Loader2, Zap,
+  ChevronRight, Trophy, Loader2, Zap, Users,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/lib/types'
 import type { User } from '@supabase/supabase-js'
+import FollowListModal from '@/components/FollowListModal'
 
 // ─── Tier helpers ────────────────────────────────────────────────────────────
 
@@ -74,13 +75,18 @@ interface Stats {
   events: number
 }
 
+type FollowModal = 'followers' | 'following' | null
+
 export default function ProfilePage() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [stats, setStats] = useState<Stats>({ favorites: 0, reviews: 0, events: 0 })
-  const [points, setPoints] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser]           = useState<User | null>(null)
+  const [profile, setProfile]     = useState<Profile | null>(null)
+  const [stats, setStats]         = useState<Stats>({ favorites: 0, reviews: 0, events: 0 })
+  const [points, setPoints]       = useState(0)
+  const [followers, setFollowers] = useState(0)
+  const [following, setFollowing] = useState(0)
+  const [followModal, setFollowModal] = useState<FollowModal>(null)
+  const [loading, setLoading]     = useState(true)
   const [signingOut, setSigningOut] = useState(false)
 
   useEffect(() => {
@@ -92,20 +98,24 @@ export default function ProfilePage() {
       }
       setUser(user)
 
-      const [profileRes, favRes, reviewRes] = await Promise.all([
+      const [profileRes, favRes, reviewRes, followersRes, followingRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
         supabase.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('reviews').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', user.id).eq('following_type', 'user'),
+        supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', user.id),
       ])
 
       if (profileRes.data) setProfile(profileRes.data as Profile)
 
-      const favCount = favRes.count ?? 0
+      const favCount    = favRes.count ?? 0
       const reviewCount = reviewRes.count ?? 0
       const calculatedPoints = favCount * 5 + reviewCount * 8
 
       setStats({ favorites: favCount, reviews: reviewCount, events: 0 })
       setPoints(calculatedPoints)
+      setFollowers(followersRes.count ?? 0)
+      setFollowing(followingRes.count ?? 0)
       setLoading(false)
     }
     load()
@@ -232,6 +242,34 @@ export default function ProfilePage() {
           ))}
         </div>
 
+        {/* ── Social stats (Abonnés / Abonnements) ──────────────────── */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setFollowModal('followers')}
+            className="bg-zinc-900 border border-purple-900/30 rounded-2xl p-4 text-center hover:border-fuchsia-500/30 active:scale-[0.98] transition-all group"
+          >
+            <div className="text-2xl font-black text-white mb-1 group-hover:text-fuchsia-300 transition-colors">
+              {followers.toLocaleString('fr-FR')}
+            </div>
+            <div className="flex items-center justify-center gap-1 text-zinc-400 text-[11px]">
+              <Users className="w-3 h-3" />
+              Abonnés
+            </div>
+          </button>
+          <button
+            onClick={() => setFollowModal('following')}
+            className="bg-zinc-900 border border-purple-900/30 rounded-2xl p-4 text-center hover:border-fuchsia-500/30 active:scale-[0.98] transition-all group"
+          >
+            <div className="text-2xl font-black text-white mb-1 group-hover:text-fuchsia-300 transition-colors">
+              {following.toLocaleString('fr-FR')}
+            </div>
+            <div className="flex items-center justify-center gap-1 text-zinc-400 text-[11px]">
+              <Users className="w-3 h-3" />
+              Abonnements
+            </div>
+          </button>
+        </div>
+
         {/* ── Action buttons ────────────────────────────────────────── */}
         <div className="space-y-2">
           <ActionLink href="/profile/pulse-points" icon={<Zap     className="w-5 h-5" />} label="Pulse Points" />
@@ -254,6 +292,15 @@ export default function ProfilePage() {
         </div>
 
       </div>
+
+      {/* ── Follow list modal ────────────────────────────────────────── */}
+      {followModal && user && (
+        <FollowListModal
+          userId={user.id}
+          mode={followModal}
+          onClose={() => setFollowModal(null)}
+        />
+      )}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import EventCard from '@/components/EventCard'
+import FollowButton from '@/components/FollowButton'
 import type { Venue, EventWithVenue } from '@/lib/types'
 import { VENUE_CATEGORY_COLORS } from '@/lib/utils'
 
@@ -49,7 +50,7 @@ export default async function VenueDetailPage({ params }: { params: { id: string
   ])
   if (!venue) notFound()
 
-  const gradient = VENUE_GRADIENTS[venue.category] ?? 'from-gray-900 to-black'
+  const gradient  = VENUE_GRADIENTS[venue.category] ?? 'from-gray-900 to-black'
   const badgeClass = VENUE_CATEGORY_COLORS[venue.category] ?? 'bg-white/10 text-white/60'
 
   return (
@@ -101,6 +102,12 @@ export default async function VenueDetailPage({ params }: { params: { id: string
 
       {/* Content */}
       <div className="px-4 md:px-8 py-6 max-w-2xl">
+
+        {/* Follow row */}
+        <div className="mb-6">
+          <FollowButton followingId={venue.id} followingType="venue" showCount />
+        </div>
+
         {/* Info grid */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {venue.address && (
@@ -182,7 +189,7 @@ export default async function VenueDetailPage({ params }: { params: { id: string
           </div>
         )}
 
-        {/* Upcoming events at this venue */}
+        {/* Upcoming events */}
         {events.length > 0 && (
           <div>
             <h2 className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3">
