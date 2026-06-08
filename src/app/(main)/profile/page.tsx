@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
   MapPin, Ticket, Heart, Settings, LogOut,
-  ChevronRight, Trophy, Loader2, Zap, Users,
+  ChevronRight, Trophy, Loader2, Zap, Users, RadioTower,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/lib/types'
@@ -75,6 +75,13 @@ interface Stats {
   events: number
 }
 
+type CheckinRow = {
+  id: string
+  created_at: string
+  venues: { name: string } | null
+  events: { title: string } | null
+}
+
 type FollowModal = 'followers' | 'following' | null
 
 export default function ProfilePage() {
@@ -85,6 +92,7 @@ export default function ProfilePage() {
   const [points, setPoints]       = useState(0)
   const [followers, setFollowers] = useState(0)
   const [following, setFollowing] = useState(0)
+  const [checkins, setCheckins]   = useState<CheckinRow[]>([])
   const [followModal, setFollowModal] = useState<FollowModal>(null)
   const [loading, setLoading]     = useState(true)
   const [signingOut, setSigningOut] = useState(false)
@@ -98,12 +106,13 @@ export default function ProfilePage() {
       }
       setUser(user)
 
-      const [profileRes, favRes, reviewRes, followersRes, followingRes] = await Promise.all([
+      const [profileRes, favRes, reviewRes, followersRes, followingRes, checkinsRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
         supabase.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('reviews').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', user.id).eq('following_type', 'user'),
         supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', user.id),
+        supabase.from('checkins').select('id, created_at, venues(name), events(title)').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5),
       ])
 
       if (profileRes.data) setProfile(profileRes.data as Profile)
@@ -116,6 +125,7 @@ export default function ProfilePage() {
       setPoints(calculatedPoints)
       setFollowers(followersRes.count ?? 0)
       setFollowing(followingRes.count ?? 0)
+      setCheckins((checkinsRes.data ?? []) as CheckinRow[])
       setLoading(false)
     }
     load()
@@ -269,6 +279,38 @@ export default function ProfilePage() {
             </div>
           </button>
         </div>
+
+        {/* ── Check-in history ──────────────────────────────────────── */}
+        {checkins.length > 0 && (
+          <div className="bg-zinc-900 border border-purple-900/30 rounded-2xl p-5">
+            <h2 className="text-xs font-bold text-white/50 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <RadioTower className="w-3.5 h-3.5 text-fuchsia-400" />
+              Mes check-ins
+            </h2>
+            <div className="space-y-3">
+              {checkins.map((c) => (
+                <div key={c.id} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-fuchsia-500/10 flex items-center justify-center shrink-0">
+                    <MapPin className="w-4 h-4 text-fuchsia-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-semibold truncate">
+                      {c.venues?.name ?? 'Lieu inconnu'}
+                    </p>
+                    {c.events?.title && (
+                      <p className="text-white/40 text-xs truncate">{c.events.title}</p>
+                    )}
+                    <p className="text-white/25 text-[10px]">
+                      {new Date(c.created_at).toLocaleDateString('fr-FR', {
+                        weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── Action buttons ────────────────────────────────────────── */}
         <div className="space-y-2">

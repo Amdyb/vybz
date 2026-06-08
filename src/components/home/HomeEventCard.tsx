@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Heart, MapPin, Users } from 'lucide-react'
 import type { EventWithVenue } from '@/lib/types'
-import { formatDate, formatPrice } from '@/lib/utils'
+import { formatDate, formatPrice, getVibe } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 
 const BADGE_COLORS: Record<string, string> = {
@@ -21,9 +21,11 @@ interface Props {
   event: EventWithVenue
   categoryLabel: string
   goingCount?: number
+  vibeCount?: number
 }
 
-export default function HomeEventCard({ event, categoryLabel, goingCount }: Props) {
+export default function HomeEventCard({ event, categoryLabel, goingCount, vibeCount }: Props) {
+  const vibe = vibeCount != null ? getVibe(vibeCount) : null
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
 
@@ -119,16 +121,23 @@ export default function HomeEventCard({ event, categoryLabel, goingCount }: Prop
             </div>
           )}
           <p className="text-white/25 text-[10px] mb-2">{formatDate(event.event_date)}</p>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-1">
             <span className={`text-xs font-bold ${event.is_free ? 'text-cyan-400' : 'text-amber-400'}`}>
               {price || '—'}
             </span>
-            {goingCount != null && goingCount > 0 && (
-              <span className="flex items-center gap-1 text-[9px] text-fuchsia-400/60 font-medium">
-                <Users className="w-2.5 h-2.5" />
-                {goingCount}
-              </span>
-            )}
+            <div className="flex items-center gap-1">
+              {vibe && (
+                <span className={`text-[8px] font-bold px-1 py-0.5 rounded-full border ${vibe.color} ${vibe.bg}`}>
+                  {vibe.label}
+                </span>
+              )}
+              {goingCount != null && goingCount > 0 && (
+                <span className="flex items-center gap-0.5 text-[9px] text-fuchsia-400/60 font-medium">
+                  <Users className="w-2.5 h-2.5" />
+                  {goingCount}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

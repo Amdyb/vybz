@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import type { EventWithVenue } from '@/lib/types'
 import { formatDate, formatTime, formatPrice, CATEGORY_COLORS } from '@/lib/utils'
 import AttendanceButtons from '@/components/events/AttendanceButtons'
+import CheckInSection from '@/components/checkin/CheckInSection'
 
 export const revalidate = 60
 
@@ -111,12 +112,21 @@ export default async function EventDetailPage({ params }: { params: { id: string
       {/* Content */}
       <div className="px-4 md:px-8 py-6 max-w-2xl">
 
-        {/* ── Attendance buttons — Going / Interested ── */}
+        {/* ── Going / Interested ── */}
         <AttendanceButtons
           eventId={event.id}
           initialGoingCount={counts.going}
           initialInterestedCount={counts.interested}
           goingAvatars={avatars}
+        />
+
+        {/* ── Check-in + Vibe Meter ── */}
+        <CheckInSection
+          venueId={event.venue_id ?? undefined}
+          venueName={event.venues?.name ?? ''}
+          eventId={event.id}
+          eventTitle={event.title}
+          eventMode
         />
 
         {/* Key info cards */}

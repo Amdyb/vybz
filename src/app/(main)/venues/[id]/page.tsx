@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import EventCard from '@/components/EventCard'
 import FollowButton from '@/components/FollowButton'
+import CheckInSection from '@/components/checkin/CheckInSection'
 import type { Venue, EventWithVenue } from '@/lib/types'
 import { VENUE_CATEGORY_COLORS } from '@/lib/utils'
 
@@ -103,10 +104,16 @@ export default async function VenueDetailPage({ params }: { params: { id: string
       {/* Content */}
       <div className="px-4 md:px-8 py-6 max-w-2xl">
 
-        {/* Follow row */}
-        <div className="mb-6">
+        {/* Follow + check-in row */}
+        <div className="flex items-center gap-4 mb-6">
           <FollowButton followingId={venue.id} followingType="venue" showCount />
         </div>
+
+        {/* Live check-in count + Vibe Meter + Se checker */}
+        <CheckInSection
+          venueId={venue.id}
+          venueName={venue.name}
+        />
 
         {/* Info grid */}
         <div className="grid grid-cols-2 gap-3 mb-6">

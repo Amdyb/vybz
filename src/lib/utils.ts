@@ -23,6 +23,18 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Underground: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
 }
 
+/** Returns vibe config based on recent check-in count. Pass includeCalm=true to get a label even at 0. */
+export function getVibe(
+  count: number,
+  includeCalm = false
+): { label: string; color: string; bg: string } | null {
+  if (count <= 0)  return includeCalm ? { label: 'Calme', color: 'text-zinc-500', bg: 'bg-zinc-800/60 border-zinc-700/50' } : null
+  if (count <= 5)  return { label: 'Ça commence',   color: 'text-blue-400',  bg: 'bg-blue-500/15 border-blue-500/25' }
+  if (count <= 15) return { label: 'Bonne ambiance', color: 'text-green-400', bg: 'bg-green-500/15 border-green-500/25' }
+  if (count <= 30) return { label: "C'est chaud",   color: 'text-amber-400', bg: 'bg-amber-500/15 border-amber-500/25' }
+  return { label: 'En feu', color: 'text-red-400', bg: 'bg-red-500/15 border-red-500/25' }
+}
+
 export const VENUE_CATEGORY_COLORS: Record<string, string> = {
   'Beach Club': 'bg-cyan-500/20 text-cyan-300',
   Club:         'bg-purple-500/20 text-purple-300',

@@ -12,9 +12,10 @@ interface Props {
   href: string
   onVoirTout?: () => void
   goingCounts?: Record<string, number>
+  vibeCounts?: Record<string, number>
 }
 
-export default function CategoryRow({ title, categoryLabel, events, href, onVoirTout, goingCounts }: Props) {
+export default function CategoryRow({ title, categoryLabel, events, href, onVoirTout, goingCounts, vibeCounts }: Props) {
   return (
     <section className="mb-7">
       {/* Row header */}
@@ -47,6 +48,7 @@ export default function CategoryRow({ title, categoryLabel, events, href, onVoir
               event={event}
               categoryLabel={categoryLabel}
               goingCount={goingCounts?.[event.id]}
+              vibeCount={vibeCounts?.[event.id]}
             />
           ))}
           {/* Right-end spacer so last card isn't flush against edge */}

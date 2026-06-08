@@ -15,6 +15,7 @@ export type Database = {
       follows:          { Row: Follow }
       notifications:    { Row: Notification }
       activity_feed:    { Row: ActivityFeed }
+      checkins:         { Row: CheckIn }
     }
   }
 }
@@ -146,6 +147,15 @@ export type PulsePointsTransaction = {
   points: number
   action: string
   description: string | null
+  created_at: string
+}
+
+export type CheckIn = {
+  id: string
+  user_id: string
+  venue_id: string | null
+  event_id: string | null
+  visibility: 'public' | 'followers' | 'private'
   created_at: string
 }
 

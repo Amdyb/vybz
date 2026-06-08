@@ -10,6 +10,7 @@ export default function EventsPage() {
   const [events, setEvents]           = useState<EventWithVenue[]>([])
   const [filtered, setFiltered]       = useState<EventWithVenue[]>([])
   const [goingCounts, setGoingCounts] = useState<Record<string, number>>({})
+  const [vibeCounts, setVibeCounts]   = useState<Record<string, number>>({})
   const [category, setCategory]       = useState('Tout')
   const [loading, setLoading]         = useState(true)
 
@@ -36,20 +37,27 @@ export default function EventsPage() {
       setEvents(deduped)
       setFiltered(deduped)
 
-      // Fetch going counts for these events
+      // Fetch going + vibe counts
       if (deduped.length) {
         const ids = deduped.map((e) => e.id)
-        const { data: rows } = await supabase
-          .from('event_attendance')
-          .select('event_id')
-          .eq('status', 'going')
-          .in('event_id', ids)
+        const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
 
-        const counts: Record<string, number> = {}
-        for (const r of (rows ?? []) as { event_id: string }[]) {
-          counts[r.event_id] = (counts[r.event_id] ?? 0) + 1
+        const [goingRes, vibeRes] = await Promise.all([
+          supabase.from('event_attendance').select('event_id').eq('status', 'going').in('event_id', ids),
+          supabase.from('checkins').select('event_id').not('event_id', 'is', null).gte('created_at', twoHoursAgo).in('event_id', ids).in('visibility', ['public', 'followers']),
+        ])
+
+        const going: Record<string, number> = {}
+        for (const r of (goingRes.data ?? []) as { event_id: string }[]) {
+          going[r.event_id] = (going[r.event_id] ?? 0) + 1
         }
-        setGoingCounts(counts)
+        setGoingCounts(going)
+
+        const vibe: Record<string, number> = {}
+        for (const r of (vibeRes.data ?? []) as { event_id: string }[]) {
+          if (r.event_id) vibe[r.event_id] = (vibe[r.event_id] ?? 0) + 1
+        }
+        setVibeCounts(vibe)
       }
 
       setLoading(false)
@@ -89,6 +97,7 @@ export default function EventsPage() {
               key={event.id}
               event={event}
               goingCount={goingCounts[event.id]}
+              vibeCount={vibeCounts[event.id]}
             />
           ))}
         </div>

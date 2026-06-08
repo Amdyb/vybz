@@ -75,6 +75,7 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
     CATEGORY_GROUPS.map((g) => g.id)
   )
   const [goingCounts, setGoingCounts] = useState<Record<string, number>>({})
+  const [vibeCounts, setVibeCounts]   = useState<Record<string, number>>({})
   const rowRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   // Load personalized row order from localStorage
@@ -101,22 +102,28 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
     } catch {}
   }, [])
 
-  // Fetch going counts client-side for all home page events
+  // Fetch going counts + vibe counts client-side
   useEffect(() => {
     if (!allEvents.length) return
     const ids = allEvents.map((e) => e.id)
-    supabase
-      .from('event_attendance')
-      .select('event_id')
-      .eq('status', 'going')
-      .in('event_id', ids)
-      .then(({ data }) => {
-        const counts: Record<string, number> = {}
-        for (const r of (data ?? []) as { event_id: string }[]) {
-          counts[r.event_id] = (counts[r.event_id] ?? 0) + 1
-        }
-        setGoingCounts(counts)
-      })
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+
+    Promise.all([
+      supabase.from('event_attendance').select('event_id').eq('status', 'going').in('event_id', ids),
+      supabase.from('checkins').select('event_id').not('event_id', 'is', null).gte('created_at', twoHoursAgo).in('event_id', ids).in('visibility', ['public', 'followers']),
+    ]).then(([goingRes, vibeRes]) => {
+      const going: Record<string, number> = {}
+      for (const r of (goingRes.data ?? []) as { event_id: string }[]) {
+        going[r.event_id] = (going[r.event_id] ?? 0) + 1
+      }
+      setGoingCounts(going)
+
+      const vibe: Record<string, number> = {}
+      for (const r of (vibeRes.data ?? []) as { event_id: string }[]) {
+        if (r.event_id) vibe[r.event_id] = (vibe[r.event_id] ?? 0) + 1
+      }
+      setVibeCounts(vibe)
+    })
   }, [allEvents])
 
   const today = new Date().toISOString().split('T')[0]
@@ -228,6 +235,7 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
               href={`/events?category=${group.id}`}
               onVoirTout={() => trackCategory(group.id)}
               goingCounts={goingCounts}
+              vibeCounts={vibeCounts}
             />
           </div>
         ))

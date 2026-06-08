@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Users } from 'lucide-react'
 import type { EventWithVenue } from '@/lib/types'
-import { formatDate, formatTime, formatPrice, CATEGORY_COLORS } from '@/lib/utils'
+import { formatDate, formatTime, formatPrice, CATEGORY_COLORS, getVibe } from '@/lib/utils'
 
 const CATEGORY_GRADIENTS: Record<string, string> = {
   Nightlife:   'from-violet-900/60 via-purple-900/40 to-black/60',
@@ -15,12 +15,14 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
 interface Props {
   event: EventWithVenue
   goingCount?: number
+  vibeCount?: number
 }
 
-export default function EventCard({ event, goingCount }: Props) {
+export default function EventCard({ event, goingCount, vibeCount }: Props) {
   const gradient  = CATEGORY_GRADIENTS[event.category] ?? 'from-gray-900/60 to-black/60'
   const badgeClass = CATEGORY_COLORS[event.category]  ?? 'bg-white/10 text-white/60 border-white/10'
   const price     = formatPrice(event.price_min, event.currency, event.is_free)
+  const vibe = vibeCount != null ? getVibe(vibeCount) : null
 
   return (
     <Link href={`/events/${event.id}`} className="group block">
@@ -85,9 +87,14 @@ export default function EventCard({ event, goingCount }: Props) {
             <span className={`text-sm font-semibold ${event.is_free ? 'text-emerald-400' : 'text-white/80'}`}>
               {price || '—'}
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-end">
+              {vibe && (
+                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${vibe.color} ${vibe.bg}`}>
+                  {vibe.label}
+                </span>
+              )}
               {goingCount != null && goingCount > 0 && (
-                <span className="flex items-center gap-1 text-[10px] text-fuchsia-400/70 font-medium">
+                <span className="flex items-center gap-0.5 text-[10px] text-fuchsia-400/70 font-medium">
                   <Users className="w-3 h-3" />
                   {goingCount}
                 </span>
