@@ -84,56 +84,34 @@ VYBZ only provides the platform — never touches ticket money.
 - Manual city change option
 - Diaspora Mode: see events in your home city from anywhere
 
-## EVENT SOURCE LAYER
-VYBZ aggregates events from multiple sources into one unified feed. All external
-sources normalize to the VYBZ event shape (see `ExternalEvent` in `src/lib/types.ts`):
-id, title, description, cover_image, city, category, event_date, start_time,
-price_min, currency, is_free, venue_name, venue_address, url, source.
-External events open the provider URL in a new tab — VYBZ never handles their payments.
-Each external card is labeled by source. Every external row/tab hides gracefully when
-no events are found for the detected city.
+## EVENT SOURCES LIVE
+All external sources normalize to the VYBZ event shape (`ExternalEvent` in
+`src/lib/types.ts`): id, title, description, cover_image, city, category, event_date,
+start_time, price_min, currency, is_free, venue_name, venue_address, url, source.
+External cards open the provider URL in a new tab (VYBZ never handles their payments),
+are labeled by source, and every external row/tab hides gracefully when a city has none.
 
-### Live now
-- Internal VYBZ events — Supabase (`events` + `venues`, RLS). Primary source.
-- Ticketmaster — LIVE. Route `/api/events/ticketmaster` (key: `TICKETMASTER_API_KEY`).
-  Home row "Concerts & Shows near you". In `/events` → Externes tab.
-- Eventbrite — BUILT. Route `/api/events/eventbrite` (Bearer `EVENTBRITE_API_KEY`).
-  Home row "Événements proches de vous". In `/events` → Externes tab.
-  NOTE: Eventbrite retired its public `/events/search/` endpoint (returns 404), so it
-  currently yields no results and hides gracefully. Code is ready; to surface real
-  Eventbrite events use org-based fetch `/v3/organizations/{org_id}/events/` or a
-  partner/affiliate feed. Revisit when we have an org ID or partner access.
+- Internal VYBZ events via Supabase — live. Primary source (`events` + `venues`, RLS).
+- Ticketmaster API — live. Key in `TICKETMASTER_API_KEY` env var.
+  Route `/api/events/ticketmaster`. Home row "Concerts & Shows near you" + `/events` Externes tab.
+- Eventbrite API — live. Key in `EVENTBRITE_API_KEY` env var.
+  Route `/api/events/eventbrite`. Home row "Événements proches de vous" + `/events` Externes tab.
+  (Eventbrite's public `/events/search/` is retired; code is ready and fails soft. Switch to
+  org-based `/v3/organizations/{org_id}/events/` or an affiliate feed to surface real data.)
 
-### Category mapping (provider → VYBZ)
-Music → Concerts & Live Music · Arts/Film/Theatre → Culture & Art ·
-Sports/Fitness/Health → Wellness & Outdoor · Food & Drink → Food & Drinks ·
-everything else → Experiences. Keep mappings consistent across all providers.
+Category mapping (provider → VYBZ): Music → Concerts & Live Music · Arts/Film/Theatre →
+Culture & Art · Sports/Fitness/Health → Wellness & Outdoor · Food & Drink → Food & Drinks ·
+else → Experiences. New source = route `/api/events/<source>` (secrets via env, ~10 min cache,
+fail soft to `{ events: [] }`), reuse `ExternalEventCard` + `ExternalEventsRow`, allow its
+image host in `next.config.js`.
 
-### Shared conventions for new sources
-- Server route at `/api/events/<source>`, secrets via env only (never in code).
-- Accept params: city, countryCode, keyword, page (+ size where supported).
-- Cache results ~10 min (`next: { revalidate: 600 }`). Fail soft → `{ events: [] }`.
-- Reuse `ExternalEventCard` (add the source to its union + badge color) and
-  `ExternalEventsRow` for the home row. Add the source to the `/events` Externes merge.
-- Allow the provider's image host(s) in `next.config.js` remotePatterns.
-
-### Future — monitor & apply (build when APIs open up)
-- Facebook Events — strongest in Dakar. APPLY NOW (Meta app review, ~4–6 weeks).
-  Highest priority for our market once approved.
-- Fever — premium experiences. Monitor their developer program; no public API yet.
-- Shotgun — francophone nightlife. Monitor their developer program; no public API yet.
-- Google Places API — venues/restaurants enrichment (not events).
-- Dice.fm, Yapsody — lower priority; revisit if/when APIs are available.
-
-### Fallback for no-API platforms (Shotgun, Fever, etc.) — affiliate paste-link model
-Until those APIs exist, cover them WITHOUT an API:
-- Let organizers paste their Shotgun/Fever (or any) event link when listing on VYBZ.
-- VYBZ renders a normal event card with a "Tickets via Shotgun" / "Tickets via Fever"
-  button (button label derives from the link's provider).
-- Clicking sends the user to Shotgun/Fever to buy — VYBZ earns affiliate traffic credit.
-- VYBZ still never touches ticket money; this fits the affiliate-commission revenue model.
-- Implementation note (later): add an optional `external_ticket_url` (+ derived provider)
-  to organizer-created events; detect provider from the URL host to set the button label.
+## EVENT SOURCES FUTURE
+- Fever — no API yet. Monitor their developer program.
+- Shotgun — no API yet. Monitor their developer program.
+- Facebook Events API — apply for access (Meta app review, ~4–6 weeks approval). High priority for Dakar.
+- Workaround for Fever and Shotgun (no API): organizers paste their event link, VYBZ shows the
+  event card with a redirect button ("Tickets via Shotgun" / "Tickets via Fever"). User clicks
+  through to buy; VYBZ earns affiliate traffic credit and never touches ticket money.
 
 ## SOCIAL FEATURES (VYBZ SOCIAL)
 - Check-in at events
@@ -244,23 +222,51 @@ Until those APIs exist, cover them WITHOUT an API:
 - English tagline: What are VYBZ tonight?
 
 ## PAGES BUILT
-- / Home page with featured hero, events grid, venues preview
-- /events Events listing with category filter
-- /events/[id] Event detail page
-- /venues Venues listing grouped by category
-- /venues/[id] Venue detail page
+- / Home — Netflix swipe layout, 6 category rows, personalization, stories
+- /events — all events plus Externes tab with Ticketmaster and Eventbrite
+- /events/[id] — event detail with Going and Interested buttons
+- /venues — all venues
+- /venues/[id] — venue detail with follow and checkin
+- /organizer/[slug] — organizer mini website
+- /profile — full profile with Pulse Points, tabs, followers
+- /profile/edit — edit profile avatar, bio, username
+- /profile/pulse-points — full points breakdown
+- /user/[username] — public profiles
+- /messages — conversation list
+- /messages/[id] — chat with realtime
+- /map — Google Maps with venues and events
+- /tickets — my tickets with QR codes
+- /enterprise — dashboard
+- /enterprise/create-event — create event form
+- /enterprise/scanner — QR scanner
+- /enterprise/analytics — analytics with charts
+- /feed — activity feed
+- /legal/terms — terms of service
+- /legal/privacy — privacy policy
+- /legal/cookies — cookie policy with banner
+- /legal/organizer-terms — organizer terms
+- /help — help center with FAQ
 
-## PAGES TO BUILD (IN ORDER)
-1. /sign-in and /sign-up (Auth)
-2. /profile (User profile + Pulse Points)
-3. /organizer/[slug] (Organizer mini-website)
-4. /tickets (My tickets with QR codes)
-5. /map (Google Maps with venues and events)
-6. /enterprise (Business dashboard)
-7. /enterprise/create-event
-8. /enterprise/scanner (QR scanner at door)
-9. /crew (Squad system)
-10. /drops (VYBZ Drops flash deals)
+## STILL TO BUILD
+- Account type selection at signup — User vs Organizer
+- Separate onboarding for organizers
+- VYBZ Drops flash deals page
+- Surprise Me feature
+- Crew system page
+- Diaspora Mode toggle
+- PayDunya organizer subscriptions
+- Reward ticket redemption flow
+- Organizer reward setup in dashboard
+- Mobile responsive audit
+- Logo redesign
+- Facebook Events API when approved
+
+## ENV VARIABLES NEEDED
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+- NEXT_PUBLIC_GOOGLE_MAPS_KEY
+- TICKETMASTER_API_KEY
+- EVENTBRITE_API_KEY
 
 ## BUILD RULES
 1. Always work in ~/vybz directory
