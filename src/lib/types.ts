@@ -252,7 +252,7 @@ export type ExternalEvent = {
   venue_name: string | null
   venue_address: string | null
   url: string
-  source: 'ticketmaster'
+  source: 'ticketmaster' | 'eventbrite'
 }
 
 export type TicketWithDetails = Ticket & {

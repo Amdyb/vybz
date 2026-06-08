@@ -7,7 +7,7 @@ import CityHeader from './CityHeader'
 import HeroCarousel from './HeroCarousel'
 import CategoryRow from './CategoryRow'
 import StoriesRow from './StoriesRow'
-import TicketmasterRow from './TicketmasterRow'
+import ExternalEventsRow from './ExternalEventsRow'
 
 const CATEGORY_GROUPS = [
   {
@@ -220,8 +220,21 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
       {/* Hero swipeable carousel */}
       <HeroCarousel events={filteredHero} />
 
-      {/* Concerts & Shows near you — external (Ticketmaster). Hidden on category filter. */}
-      {!isCategoryFilter && <TicketmasterRow />}
+      {/* External event rows — hidden on category filter, each hides itself if empty. */}
+      {!isCategoryFilter && (
+        <>
+          <ExternalEventsRow
+            endpoint="/api/events/ticketmaster"
+            title="Concerts & Shows near you"
+            source="ticketmaster"
+          />
+          <ExternalEventsRow
+            endpoint="/api/events/eventbrite"
+            title="Événements proches de vous"
+            source="eventbrite"
+          />
+        </>
+      )}
 
       {/* Category rows */}
       {!allEmpty ? (

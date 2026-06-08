@@ -18,9 +18,15 @@ function formatExternalPrice(ev: ExternalEvent): string {
   return `dès ${ev.price_min.toLocaleString('fr-FR')} ${ev.currency ?? ''}`.trim()
 }
 
+const SOURCE_META: Record<ExternalEvent['source'], { label: string; color: string }> = {
+  ticketmaster: { label: 'Ticketmaster', color: 'text-[#026CDF]' },
+  eventbrite:   { label: 'Eventbrite',   color: 'text-[#F05537]' },
+}
+
 export default function ExternalEventCard({ event }: { event: ExternalEvent }) {
   const badgeClass = CATEGORY_BADGE[event.category] ?? 'bg-white/10 text-white/60 border-white/10'
   const price = formatExternalPrice(event)
+  const source = SOURCE_META[event.source]
 
   return (
     <a
@@ -89,10 +95,12 @@ export default function ExternalEventCard({ event }: { event: ExternalEvent }) {
             </span>
           </div>
 
-          {/* Powered by Ticketmaster */}
+          {/* Source label */}
           <div className="mt-2 pt-2 border-t border-white/5 flex items-center gap-1">
             <span className="text-[8px] uppercase tracking-wider text-white/25">Powered by</span>
-            <span className="text-[8px] font-bold uppercase tracking-wider text-[#026CDF]">Ticketmaster</span>
+            <span className={`text-[8px] font-bold uppercase tracking-wider ${source.color}`}>
+              {source.label}
+            </span>
           </div>
         </div>
       </div>

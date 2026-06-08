@@ -84,13 +84,21 @@ export default function EventsPage() {
     setExtLoading(true)
 
     async function fetchExternal(city: string, countryCode: string) {
+      const params = new URLSearchParams({ size: '40' })
+      if (city) params.set('city', city)
+      if (countryCode) params.set('countryCode', countryCode)
+
       try {
-        const params = new URLSearchParams({ size: '40' })
-        if (city) params.set('city', city)
-        if (countryCode) params.set('countryCode', countryCode)
-        const res = await fetch(`/api/events/ticketmaster?${params.toString()}`)
-        const data = (await res.json()) as { events?: ExternalEvent[] }
-        setExternal(data.events ?? [])
+        // Fetch both providers in parallel; each fails soft to an empty list
+        const [tmRes, ebRes] = await Promise.all([
+          fetch(`/api/events/ticketmaster?${params.toString()}`).then((r) => r.json()).catch(() => ({ events: [] })),
+          fetch(`/api/events/eventbrite?${params.toString()}`).then((r) => r.json()).catch(() => ({ events: [] })),
+        ]) as { events?: ExternalEvent[] }[]
+
+        // Merge and sort by date (events without a date sink to the end)
+        const merged = [...(tmRes.events ?? []), ...(ebRes.events ?? [])]
+        merged.sort((a, b) => (a.event_date || '9999').localeCompare(b.event_date || '9999'))
+        setExternal(merged)
       } catch {
         setExternal([])
       } finally {
@@ -172,10 +180,12 @@ export default function EventsPage() {
       {/* ── Externes (Ticketmaster) tab ── */}
       {tab === 'externes' && (
         <>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-white/40 text-sm">Concerts et spectacles près de chez vous</p>
-            <span className="text-[10px] uppercase tracking-wider text-white/25">
-              Powered by <span className="text-[#026CDF] font-bold">Ticketmaster</span>
+          <div className="flex items-center justify-between mb-4 gap-2">
+            <p className="text-white/40 text-sm">Événements près de chez vous</p>
+            <span className="text-[10px] uppercase tracking-wider text-white/25 shrink-0">
+              Via <span className="text-[#026CDF] font-bold">Ticketmaster</span>
+              {' · '}
+              <span className="text-[#F05537] font-bold">Eventbrite</span>
             </span>
           </div>
 
