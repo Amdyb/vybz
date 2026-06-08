@@ -14,6 +14,7 @@ export type Database = {
       event_attendance: { Row: EventAttendance }
       follows:          { Row: Follow }
       notifications:    { Row: Notification }
+      activity_feed:    { Row: ActivityFeed }
     }
   }
 }
@@ -145,6 +146,17 @@ export type PulsePointsTransaction = {
   points: number
   action: string
   description: string | null
+  created_at: string
+}
+
+export type ActivityFeed = {
+  id: string
+  user_id: string
+  action_type: 'event_attendance' | 'event_interest' | 'checkin' | 'review' | 'story' | 'event_created' | 'recommendation'
+  target_id: string | null
+  target_type: string | null
+  metadata: Record<string, string | number | boolean | null>
+  is_public: boolean
   created_at: string
 }
 

@@ -4,16 +4,16 @@ import React, { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { User, Map as MapIcon, Zap, Ticket } from 'lucide-react'
+import { User, Compass, Activity, Zap, Ticket } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import NotificationBell from '@/components/NotificationBell'
 
 const navLinks: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { href: '/',        label: 'Accueil', icon: HomeIcon },
-  { href: '/map',     label: 'Carte',   icon: MapIcon },
-  { href: '/tickets', label: 'Tickets', icon: Ticket },
-  { href: '/venues',  label: 'Lieux',   icon: MapPinIcon },
+  { href: '/',         label: 'Accueil',   icon: HomeIcon },
+  { href: '/discover', label: 'Découvrir', icon: Compass },
+  { href: '/feed',     label: 'Feed',      icon: Activity },
+  { href: '/tickets',  label: 'Tickets',   icon: Ticket },
 ]
 
 function getInitials(user: SupabaseUser): string {
@@ -195,11 +195,3 @@ function HomeIcon({ className }: { className?: string }) {
 }
 
 
-function MapPinIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-  )
-}
