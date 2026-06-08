@@ -11,9 +11,10 @@ interface Props {
   events: EventWithVenue[]
   href: string
   onVoirTout?: () => void
+  goingCounts?: Record<string, number>
 }
 
-export default function CategoryRow({ title, categoryLabel, events, href, onVoirTout }: Props) {
+export default function CategoryRow({ title, categoryLabel, events, href, onVoirTout, goingCounts }: Props) {
   return (
     <section className="mb-7">
       {/* Row header */}
@@ -41,7 +42,12 @@ export default function CategoryRow({ title, categoryLabel, events, href, onVoir
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', paddingRight: '8px' }}
         >
           {events.map((event) => (
-            <HomeEventCard key={event.id} event={event} categoryLabel={categoryLabel} />
+            <HomeEventCard
+              key={event.id}
+              event={event}
+              categoryLabel={categoryLabel}
+              goingCount={goingCounts?.[event.id]}
+            />
           ))}
           {/* Right-end spacer so last card isn't flush against edge */}
           <div className="shrink-0 w-2" />

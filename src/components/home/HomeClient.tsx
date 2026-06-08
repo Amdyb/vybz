@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { supabase } from '@/lib/supabase'
 import type { EventWithVenue } from '@/lib/types'
 import CityHeader from './CityHeader'
 import HeroCarousel from './HeroCarousel'
@@ -73,6 +74,7 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
   const [orderedIds, setOrderedIds] = useState<CategoryId[]>(
     CATEGORY_GROUPS.map((g) => g.id)
   )
+  const [goingCounts, setGoingCounts] = useState<Record<string, number>>({})
   const rowRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   // Load personalized row order from localStorage
@@ -98,6 +100,24 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
       localStorage.setItem('vybz-cat-prefs', JSON.stringify(prefs))
     } catch {}
   }, [])
+
+  // Fetch going counts client-side for all home page events
+  useEffect(() => {
+    if (!allEvents.length) return
+    const ids = allEvents.map((e) => e.id)
+    supabase
+      .from('event_attendance')
+      .select('event_id')
+      .eq('status', 'going')
+      .in('event_id', ids)
+      .then(({ data }) => {
+        const counts: Record<string, number> = {}
+        for (const r of (data ?? []) as { event_id: string }[]) {
+          counts[r.event_id] = (counts[r.event_id] ?? 0) + 1
+        }
+        setGoingCounts(counts)
+      })
+  }, [allEvents])
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -207,6 +227,7 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
               events={group.events}
               href={`/events?category=${group.id}`}
               onVoirTout={() => trackCategory(group.id)}
+              goingCounts={goingCounts}
             />
           </div>
         ))

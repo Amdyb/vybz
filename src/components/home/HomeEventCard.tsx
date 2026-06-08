@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart, MapPin } from 'lucide-react'
+import { Heart, MapPin, Users } from 'lucide-react'
 import type { EventWithVenue } from '@/lib/types'
 import { formatDate, formatPrice } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
@@ -20,14 +20,14 @@ const BADGE_COLORS: Record<string, string> = {
 interface Props {
   event: EventWithVenue
   categoryLabel: string
+  goingCount?: number
 }
 
-export default function HomeEventCard({ event, categoryLabel }: Props) {
+export default function HomeEventCard({ event, categoryLabel, goingCount }: Props) {
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  const badgeClass =
-    BADGE_COLORS[categoryLabel] ?? 'bg-white/10 text-white/60 border-white/10'
+  const badgeClass = BADGE_COLORS[categoryLabel] ?? 'bg-white/10 text-white/60 border-white/10'
   const price = formatPrice(event.price_min, event.currency, event.is_free)
 
   const handleSave = useCallback(
@@ -106,9 +106,7 @@ export default function HomeEventCard({ event, categoryLabel }: Props) {
 
         {/* Text content */}
         <div className="p-3 pt-2.5">
-          <span
-            className={`inline-block text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${badgeClass}`}
-          >
+          <span className={`inline-block text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${badgeClass}`}>
             {event.category}
           </span>
           <h3 className="text-white/90 text-xs font-semibold mt-1.5 mb-1 line-clamp-2 group-hover:text-white transition-colors leading-snug">
@@ -121,11 +119,17 @@ export default function HomeEventCard({ event, categoryLabel }: Props) {
             </div>
           )}
           <p className="text-white/25 text-[10px] mb-2">{formatDate(event.event_date)}</p>
-          <span
-            className={`text-xs font-bold ${event.is_free ? 'text-cyan-400' : 'text-amber-400'}`}
-          >
-            {price || '—'}
-          </span>
+          <div className="flex items-center justify-between">
+            <span className={`text-xs font-bold ${event.is_free ? 'text-cyan-400' : 'text-amber-400'}`}>
+              {price || '—'}
+            </span>
+            {goingCount != null && goingCount > 0 && (
+              <span className="flex items-center gap-1 text-[9px] text-fuchsia-400/60 font-medium">
+                <Users className="w-2.5 h-2.5" />
+                {goingCount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </Link>

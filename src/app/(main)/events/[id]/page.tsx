@@ -3,8 +3,11 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import type { EventWithVenue } from '@/lib/types'
 import { formatDate, formatTime, formatPrice, CATEGORY_COLORS } from '@/lib/utils'
+import AttendanceButtons from '@/components/events/AttendanceButtons'
 
 export const revalidate = 60
+
+type GoingAvatar = { id: string; full_name: string | null; avatar_url: string | null }
 
 async function getEvent(id: string): Promise<EventWithVenue | null> {
   const { data } = await supabase
@@ -13,6 +16,37 @@ async function getEvent(id: string): Promise<EventWithVenue | null> {
     .eq('id', id)
     .single()
   return data as EventWithVenue | null
+}
+
+async function getAttendanceCounts(eventId: string): Promise<{ going: number; interested: number }> {
+  const { data } = await supabase
+    .from('event_attendance')
+    .select('status')
+    .eq('event_id', eventId)
+  const rows = (data ?? []) as { status: string }[]
+  return {
+    going:      rows.filter((r) => r.status === 'going').length,
+    interested: rows.filter((r) => r.status === 'interested').length,
+  }
+}
+
+async function getGoingAvatars(eventId: string): Promise<GoingAvatar[]> {
+  const { data: rows } = await supabase
+    .from('event_attendance')
+    .select('user_id')
+    .eq('event_id', eventId)
+    .eq('status', 'going')
+    .order('created_at', { ascending: false })
+    .limit(5)
+
+  if (!rows?.length) return []
+
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, full_name, avatar_url')
+    .in('id', (rows as { user_id: string }[]).map((r) => r.user_id))
+
+  return (profiles ?? []) as GoingAvatar[]
 }
 
 const CATEGORY_GRADIENTS: Record<string, string> = {
@@ -24,12 +58,17 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
 }
 
 export default async function EventDetailPage({ params }: { params: { id: string } }) {
-  const event = await getEvent(params.id)
+  const [event, counts, avatars] = await Promise.all([
+    getEvent(params.id),
+    getAttendanceCounts(params.id),
+    getGoingAvatars(params.id),
+  ])
+
   if (!event) notFound()
 
-  const gradient = CATEGORY_GRADIENTS[event.category] ?? 'from-gray-900 to-black'
-  const badgeClass = CATEGORY_COLORS[event.category] ?? 'bg-white/10 text-white/60 border-white/10'
-  const price = formatPrice(event.price_min, event.currency, event.is_free)
+  const gradient  = CATEGORY_GRADIENTS[event.category] ?? 'from-gray-900 to-black'
+  const badgeClass = CATEGORY_COLORS[event.category]  ?? 'bg-white/10 text-white/60 border-white/10'
+  const price     = formatPrice(event.price_min, event.currency, event.is_free)
 
   return (
     <div className="min-h-screen">
@@ -62,12 +101,25 @@ export default async function EventDetailPage({ params }: { params: { id: string
             )}
           </div>
           <h1 className="text-2xl md:text-3xl font-black text-white">{event.title}</h1>
+          <p className="text-white/50 text-sm mt-1">
+            {formatDate(event.event_date)} · {formatTime(event.start_time)}
+            {event.end_time && ` – ${formatTime(event.end_time)}`}
+          </p>
         </div>
       </div>
 
       {/* Content */}
       <div className="px-4 md:px-8 py-6 max-w-2xl">
-        {/* Key info row */}
+
+        {/* ── Attendance buttons — Going / Interested ── */}
+        <AttendanceButtons
+          eventId={event.id}
+          initialGoingCount={counts.going}
+          initialInterestedCount={counts.interested}
+          goingAvatars={avatars}
+        />
+
+        {/* Key info cards */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="bg-white/5 border border-white/[0.06] rounded-2xl p-4">
             <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Date</p>

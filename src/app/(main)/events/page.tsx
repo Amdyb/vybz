@@ -7,10 +7,11 @@ import CategoryFilter from '@/components/CategoryFilter'
 import type { EventWithVenue } from '@/lib/types'
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<EventWithVenue[]>([])
-  const [filtered, setFiltered] = useState<EventWithVenue[]>([])
-  const [category, setCategory] = useState('Tout')
-  const [loading, setLoading] = useState(true)
+  const [events, setEvents]           = useState<EventWithVenue[]>([])
+  const [filtered, setFiltered]       = useState<EventWithVenue[]>([])
+  const [goingCounts, setGoingCounts] = useState<Record<string, number>>({})
+  const [category, setCategory]       = useState('Tout')
+  const [loading, setLoading]         = useState(true)
 
   useEffect(() => {
     async function load() {
@@ -25,7 +26,6 @@ export default function EventsPage() {
 
       if (!data) { setLoading(false); return }
 
-      // Deduplicate by title+date
       const seen = new Set<string>()
       const deduped = (data as EventWithVenue[]).filter((e) => {
         const key = `${e.title}|${e.event_date}`
@@ -35,17 +35,30 @@ export default function EventsPage() {
       })
       setEvents(deduped)
       setFiltered(deduped)
+
+      // Fetch going counts for these events
+      if (deduped.length) {
+        const ids = deduped.map((e) => e.id)
+        const { data: rows } = await supabase
+          .from('event_attendance')
+          .select('event_id')
+          .eq('status', 'going')
+          .in('event_id', ids)
+
+        const counts: Record<string, number> = {}
+        for (const r of (rows ?? []) as { event_id: string }[]) {
+          counts[r.event_id] = (counts[r.event_id] ?? 0) + 1
+        }
+        setGoingCounts(counts)
+      }
+
       setLoading(false)
     }
     load()
   }, [])
 
   useEffect(() => {
-    if (category === 'Tout') {
-      setFiltered(events)
-    } else {
-      setFiltered(events.filter((e) => e.category === category))
-    }
+    setFiltered(category === 'Tout' ? events : events.filter((e) => e.category === category))
   }, [category, events])
 
   return (
@@ -72,7 +85,11 @@ export default function EventsPage() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {filtered.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <EventCard
+              key={event.id}
+              event={event}
+              goingCount={goingCounts[event.id]}
+            />
           ))}
         </div>
       )}

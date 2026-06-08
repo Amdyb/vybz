@@ -10,7 +10,8 @@ export type Database = {
       orders:       { Row: Order }
       tickets:      { Row: Ticket }
       pulse_points_transactions: { Row: PulsePointsTransaction }
-      stories:      { Row: Story }
+      stories:          { Row: Story }
+      event_attendance: { Row: EventAttendance }
     }
   }
 }
@@ -142,6 +143,14 @@ export type PulsePointsTransaction = {
   points: number
   action: string
   description: string | null
+  created_at: string
+}
+
+export type EventAttendance = {
+  id: string
+  user_id: string
+  event_id: string
+  status: 'going' | 'interested'
   created_at: string
 }
 

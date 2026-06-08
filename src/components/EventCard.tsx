@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { Users } from 'lucide-react'
 import type { EventWithVenue } from '@/lib/types'
 import { formatDate, formatTime, formatPrice, CATEGORY_COLORS } from '@/lib/utils'
 
@@ -11,10 +12,15 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
   Underground: 'from-rose-900/60 via-red-900/40 to-black/60',
 }
 
-export default function EventCard({ event }: { event: EventWithVenue }) {
-  const gradient = CATEGORY_GRADIENTS[event.category] ?? 'from-gray-900/60 to-black/60'
-  const badgeClass = CATEGORY_COLORS[event.category] ?? 'bg-white/10 text-white/60 border-white/10'
-  const price = formatPrice(event.price_min, event.currency, event.is_free)
+interface Props {
+  event: EventWithVenue
+  goingCount?: number
+}
+
+export default function EventCard({ event, goingCount }: Props) {
+  const gradient  = CATEGORY_GRADIENTS[event.category] ?? 'from-gray-900/60 to-black/60'
+  const badgeClass = CATEGORY_COLORS[event.category]  ?? 'bg-white/10 text-white/60 border-white/10'
+  const price     = formatPrice(event.price_min, event.currency, event.is_free)
 
   return (
     <Link href={`/events/${event.id}`} className="group block">
@@ -31,7 +37,6 @@ export default function EventCard({ event }: { event: EventWithVenue }) {
               sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           )}
-          {/* Overlay — always shown so badges stay readable */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
           {/* Date pill */}
@@ -80,9 +85,17 @@ export default function EventCard({ event }: { event: EventWithVenue }) {
             <span className={`text-sm font-semibold ${event.is_free ? 'text-emerald-400' : 'text-white/80'}`}>
               {price || '—'}
             </span>
-            <span className="text-[10px] text-violet-400/70 group-hover:text-violet-400 transition-colors font-medium">
-              Voir →
-            </span>
+            <div className="flex items-center gap-2">
+              {goingCount != null && goingCount > 0 && (
+                <span className="flex items-center gap-1 text-[10px] text-fuchsia-400/70 font-medium">
+                  <Users className="w-3 h-3" />
+                  {goingCount}
+                </span>
+              )}
+              <span className="text-[10px] text-violet-400/70 group-hover:text-violet-400 transition-colors font-medium">
+                Voir →
+              </span>
+            </div>
           </div>
         </div>
 
