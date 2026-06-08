@@ -7,6 +7,7 @@ import CityHeader from './CityHeader'
 import HeroCarousel from './HeroCarousel'
 import CategoryRow from './CategoryRow'
 import StoriesRow from './StoriesRow'
+import TicketmasterRow from './TicketmasterRow'
 
 const CATEGORY_GROUPS = [
   {
@@ -218,6 +219,9 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
 
       {/* Hero swipeable carousel */}
       <HeroCarousel events={filteredHero} />
+
+      {/* Concerts & Shows near you — external (Ticketmaster). Hidden on category filter. */}
+      {!isCategoryFilter && <TicketmasterRow />}
 
       {/* Category rows */}
       {!allEmpty ? (

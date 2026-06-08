@@ -236,6 +236,25 @@ export type Story = {
 
 export type EventWithVenue = Event & { venues: Venue | null }
 
+/** Event sourced from an external provider (e.g. Ticketmaster), normalized to VYBZ shape. */
+export type ExternalEvent = {
+  id: string
+  title: string
+  description: string | null
+  cover_image: string | null
+  city: string | null
+  category: string
+  event_date: string
+  start_time: string | null
+  price_min: number | null
+  currency: string | null
+  is_free: boolean
+  venue_name: string | null
+  venue_address: string | null
+  url: string
+  source: 'ticketmaster'
+}
+
 export type TicketWithDetails = Ticket & {
   events: (Event & { venues: Pick<Venue, 'name' | 'city' | 'address'> | null }) | null
   ticket_types: Pick<TicketType, 'name' | 'price' | 'currency'> | null
