@@ -4,15 +4,15 @@ import React, { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { User, Map as MapIcon, Zap } from 'lucide-react'
+import { User, Map as MapIcon, Zap, Ticket } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 const navLinks: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { href: '/',       label: 'Accueil',    icon: HomeIcon },
-  { href: '/events', label: 'Événements', icon: CalendarIcon },
-  { href: '/venues', label: 'Lieux',      icon: MapPinIcon },
-  { href: '/map',    label: 'Carte',      icon: MapIcon },
+  { href: '/',        label: 'Accueil', icon: HomeIcon },
+  { href: '/map',     label: 'Carte',   icon: MapIcon },
+  { href: '/tickets', label: 'Tickets', icon: Ticket },
+  { href: '/venues',  label: 'Lieux',   icon: MapPinIcon },
 ]
 
 function getInitials(user: SupabaseUser): string {
@@ -67,7 +67,7 @@ export default function Navbar() {
   }, [fetchPoints])
 
   const profileHref   = user ? '/profile' : '/sign-in'
-  const profileActive = pathname === '/profile' || pathname === '/profile/pulse-points'
+  const profileActive = pathname.startsWith('/profile')
 
   return (
     <>
@@ -190,13 +190,6 @@ function HomeIcon({ className }: { className?: string }) {
   )
 }
 
-function CalendarIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-  )
-}
 
 function MapPinIcon({ className }: { className?: string }) {
   return (
