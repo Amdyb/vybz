@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart } from 'lucide-react'
+import { Heart, MapPin } from 'lucide-react'
 import type { EventWithVenue } from '@/lib/types'
 import { formatDate, formatPrice } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
@@ -37,9 +37,7 @@ export default function HomeEventCard({ event, categoryLabel }: Props) {
       if (saving) return
       setSaving(true)
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      const { data: { session } } = await supabase.auth.getSession()
 
       if (!session) {
         window.location.href = '/sign-in'
@@ -66,22 +64,22 @@ export default function HomeEventCard({ event, categoryLabel }: Props) {
   )
 
   return (
-    <Link href={`/events/${event.id}`} className="group block shrink-0 w-40 md:w-48">
-      <div className="rounded-2xl overflow-hidden bg-zinc-900 border border-purple-900/30 hover:border-fuchsia-500/30 transition-all duration-300 hover:shadow-[0_0_24px_rgba(217,70,239,0.15)] hover:-translate-y-0.5">
-        {/* Image area */}
-        <div className="relative h-52 bg-gradient-to-br from-fuchsia-900/50 to-purple-900/50">
+    <Link href={`/events/${event.id}`} className="group block snap-start shrink-0 w-44">
+      <div className="rounded-2xl overflow-hidden bg-zinc-900 border border-purple-900/30 group-hover:border-fuchsia-500/30 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(217,70,239,0.12)] group-hover:-translate-y-0.5">
+        {/* Image */}
+        <div className="relative h-56 bg-gradient-to-br from-fuchsia-900/40 to-purple-900/40">
           {event.cover_image && (
             <Image
               src={event.cover_image}
               alt={event.title}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 160px, 192px"
+              sizes="176px"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
 
-          {/* Heart button */}
+          {/* Heart save button */}
           <button
             onClick={handleSave}
             disabled={saving}
@@ -96,22 +94,20 @@ export default function HomeEventCard({ event, categoryLabel }: Props) {
           </button>
 
           {/* Date pill */}
-          <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1 text-center">
-            <div className="text-[9px] text-white/50 uppercase leading-none">
-              {new Date(event.event_date + 'T00:00:00').toLocaleDateString('fr-FR', {
-                month: 'short',
-              })}
+          <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1 text-center min-w-[32px]">
+            <div className="text-[8px] text-white/50 uppercase leading-none">
+              {new Date(event.event_date + 'T00:00:00').toLocaleDateString('fr-FR', { month: 'short' })}
             </div>
-            <div className="text-sm font-bold text-white leading-tight">
+            <div className="text-sm font-black text-white leading-tight">
               {new Date(event.event_date + 'T00:00:00').getDate()}
             </div>
           </div>
         </div>
 
-        {/* Card content */}
-        <div className="p-3">
+        {/* Text content */}
+        <div className="p-3 pt-2.5">
           <span
-            className={`text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${badgeClass}`}
+            className={`inline-block text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${badgeClass}`}
           >
             {event.category}
           </span>
@@ -119,13 +115,14 @@ export default function HomeEventCard({ event, categoryLabel }: Props) {
             {event.title}
           </h3>
           {event.venues?.name && (
-            <p className="text-white/40 text-[10px] truncate mb-0.5">{event.venues.name}</p>
+            <div className="flex items-center gap-1 mb-1">
+              <MapPin className="w-2.5 h-2.5 text-white/30 shrink-0" />
+              <p className="text-white/40 text-[10px] truncate">{event.venues.name}</p>
+            </div>
           )}
-          <p className="text-white/30 text-[10px] mb-2">{formatDate(event.event_date)}</p>
+          <p className="text-white/25 text-[10px] mb-2">{formatDate(event.event_date)}</p>
           <span
-            className={`text-xs font-bold ${
-              event.is_free ? 'text-cyan-400' : 'text-amber-400'
-            }`}
+            className={`text-xs font-bold ${event.is_free ? 'text-cyan-400' : 'text-amber-400'}`}
           >
             {price || '—'}
           </span>

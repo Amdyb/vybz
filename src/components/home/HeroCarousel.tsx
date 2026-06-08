@@ -3,14 +3,16 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Ticket } from 'lucide-react'
+import { Ticket, MapPin } from 'lucide-react'
 import type { EventWithVenue } from '@/lib/types'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
 
 export default function HeroCarousel({ events }: { events: EventWithVenue[] }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
+  const pausedRef = useRef(false)
 
+  // Sync active dot with scroll position
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -22,26 +24,50 @@ export default function HeroCarousel({ events }: { events: EventWithVenue[] }) {
     return () => el.removeEventListener('scroll', onScroll)
   }, [events.length])
 
+  // Auto-advance every 5 seconds unless user is interacting
+  useEffect(() => {
+    if (events.length <= 1) return
+    const timer = setInterval(() => {
+      if (pausedRef.current) return
+      setActive((prev) => {
+        const next = (prev + 1) % events.length
+        scrollRef.current?.scrollTo({
+          left: next * (scrollRef.current?.clientWidth ?? 0),
+          behavior: 'smooth',
+        })
+        return next
+      })
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [events.length])
+
   const scrollTo = (idx: number) => {
-    const el = scrollRef.current
-    if (!el) return
-    el.scrollTo({ left: idx * el.clientWidth, behavior: 'smooth' })
+    pausedRef.current = true
+    setTimeout(() => { pausedRef.current = false }, 8000)
+    scrollRef.current?.scrollTo({
+      left: idx * (scrollRef.current?.clientWidth ?? 0),
+      behavior: 'smooth',
+    })
   }
 
   if (!events.length) return null
 
   return (
-    <div className="mb-8">
+    <div className="mb-6 mt-3">
+      {/* Cards */}
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        onTouchStart={() => { pausedRef.current = true }}
+        onTouchEnd={() => { setTimeout(() => { pausedRef.current = false }, 8000) }}
+        className="flex overflow-x-auto snap-x snap-mandatory"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', gap: '12px', paddingLeft: '16px', paddingRight: '16px' }}
       >
         {events.map((event) => (
-          <div
+          <Link
             key={event.id}
-            className="snap-center shrink-0 relative rounded-3xl overflow-hidden bg-zinc-900 border border-purple-900/30"
-            style={{ width: 'calc(100vw - 3rem)', maxWidth: 380, height: 480 }}
+            href={`/events/${event.id}`}
+            className="snap-center shrink-0 relative rounded-3xl overflow-hidden bg-zinc-900 border border-purple-900/30 active:scale-[0.98] transition-transform"
+            style={{ width: 'calc(100vw - 3rem)', maxWidth: 400, height: 500 }}
           >
             {event.cover_image ? (
               <Image
@@ -49,15 +75,16 @@ export default function HeroCarousel({ events }: { events: EventWithVenue[] }) {
                 alt={event.title}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 90vw, 380px"
+                sizes="(max-width: 768px) 90vw, 400px"
                 priority
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-900 via-purple-900 to-cyan-900" />
             )}
 
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
+            {/* Gradient overlay — strong at bottom for legibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
 
             {/* Featured badge */}
             {event.is_featured && (
@@ -71,35 +98,38 @@ export default function HeroCarousel({ events }: { events: EventWithVenue[] }) {
               {event.category}
             </div>
 
-            {/* Content */}
+            {/* Bottom content */}
             <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
-              <h2 className="text-2xl font-black text-white mb-1.5 leading-tight line-clamp-2">
+              <h2 className="text-[22px] font-black text-white mb-1.5 leading-tight line-clamp-2 tracking-tight">
                 {event.title}
               </h2>
+
               {event.venues?.name && (
-                <p className="text-white/50 text-xs mb-0.5">{event.venues.name}</p>
+                <div className="flex items-center gap-1 mb-0.5">
+                  <MapPin className="w-3 h-3 text-white/40 shrink-0" />
+                  <p className="text-white/50 text-xs truncate">{event.venues.name}</p>
+                </div>
               )}
-              <p className="text-white/40 text-xs mb-4">
+
+              <p className="text-white/35 text-xs mb-5">
                 {formatDate(event.event_date)} · {formatTime(event.start_time)}
               </p>
+
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-base font-black ${
+                  className={`text-lg font-black ${
                     event.is_free ? 'text-cyan-400' : 'text-amber-400'
                   }`}
                 >
                   {formatPrice(event.price_min, event.currency, event.is_free)}
                 </span>
-                <Link
-                  href={`/events/${event.id}`}
-                  className="flex items-center gap-1.5 bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white text-xs font-bold px-5 py-2.5 rounded-2xl hover:opacity-90 active:scale-95 transition-all"
-                >
+                <span className="flex items-center gap-1.5 bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white text-xs font-bold px-5 py-2.5 rounded-2xl shadow-[0_0_20px_rgba(217,70,239,0.4)]">
                   <Ticket className="w-3.5 h-3.5" />
-                  Acheter
-                </Link>
+                  Voir l&apos;événement
+                </span>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
