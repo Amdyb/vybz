@@ -85,11 +85,25 @@ export type Profile = {
   business_name: string | null
   subscription_plan: string | null     // 'basic' | 'pro' | 'premium'
   is_verified_organizer: boolean | null
+  is_organizer: boolean | null
+  organizer_preferences: OrganizerPreferences | null
   favorite_categories: string[] | null
   pulse_points: number | null
   events_attended: number | null
   reviews_count: number | null
   created_at: string | null
+}
+
+export type OrganizerPreferences = {
+  business_type: string | null
+  city: string | null
+  country: string | null
+  payment_methods: string[]
+  social: {
+    instagram: string | null
+    whatsapp: string | null
+    website: string | null
+  }
 }
 
 export type Favorite = {
