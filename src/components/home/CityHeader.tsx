@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Bell, User, ChevronDown } from 'lucide-react'
+import { Bell, User, ChevronDown, MapPin, Globe, Check, Plane } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import NotificationBell from '@/components/NotificationBell'
+import { useLocation } from '@/components/LocationProvider'
 
 function getInitials(user: SupabaseUser): string {
   const name =
@@ -23,15 +24,11 @@ function getInitials(user: SupabaseUser): string {
 }
 
 export default function CityHeader() {
-  const [city, setCity] = useState('Dakar')
   const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [open, setOpen] = useState(false)
+  const { detectedCity, homeCity, diaspora, activeCity, setDiaspora } = useLocation()
 
   useEffect(() => {
-    fetch('https://ipapi.co/json/')
-      .then((r) => r.json())
-      .then((data) => { if (data.city) setCity(data.city) })
-      .catch(() => {})
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
     })
@@ -42,6 +39,11 @@ export default function CityHeader() {
   }, [])
 
   const profileHref = user ? '/profile' : '/sign-in'
+
+  function choose(useDiaspora: boolean) {
+    setDiaspora(useDiaspora)
+    setOpen(false)
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-black flex items-center justify-between px-4 py-3 border-b border-white/5">
@@ -56,10 +58,83 @@ export default function CityHeader() {
             priority
           />
         </Link>
-        <button className="flex items-center gap-1">
-          <span className="text-sm font-bold text-white">{city}</span>
-          <ChevronDown className="w-3.5 h-3.5 text-white/40" />
-        </button>
+
+        {/* City selector — opens the Diaspora Mode picker */}
+        <div className="relative">
+          <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-1 active:scale-95 transition-transform">
+            {diaspora && <Globe className="w-3.5 h-3.5 text-cyan-400" />}
+            <span className="text-sm font-bold text-white">{activeCity}</span>
+            <ChevronDown className={`w-3.5 h-3.5 text-white/40 transition-transform ${open ? 'rotate-180' : ''}`} />
+          </button>
+
+          {diaspora && (
+            <span className="absolute -bottom-2 left-0 text-[8px] font-bold uppercase tracking-wider text-cyan-400/80 whitespace-nowrap">
+              Mode Diaspora
+            </span>
+          )}
+
+          {open && (
+            <>
+              {/* Backdrop to close on outside tap */}
+              <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+              <div className="absolute top-full left-0 mt-2 z-50 w-64 rounded-2xl bg-zinc-900 border border-purple-900/40 shadow-xl shadow-black/50 overflow-hidden">
+                <div className="px-4 py-3 border-b border-white/5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/40">Quels VYBZ ?</p>
+                </div>
+
+                {/* Current location */}
+                <button
+                  onClick={() => choose(false)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+                >
+                  <span className="w-8 h-8 rounded-full bg-fuchsia-500/15 border border-fuchsia-500/30 flex items-center justify-center shrink-0">
+                    <MapPin className="w-4 h-4 text-fuchsia-400" />
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-sm font-semibold text-white truncate">{detectedCity}</span>
+                    <span className="block text-[11px] text-white/40">Ma position actuelle</span>
+                  </span>
+                  {!diaspora && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
+                </button>
+
+                {/* Home city (Diaspora) */}
+                {homeCity ? (
+                  <button
+                    onClick={() => choose(true)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors border-t border-white/5"
+                  >
+                    <span className="w-8 h-8 rounded-full bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0">
+                      <Plane className="w-4 h-4 text-cyan-400" />
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-sm font-semibold text-white truncate">{homeCity}</span>
+                      <span className="block text-[11px] text-white/40">Ma ville d&apos;origine · Diaspora</span>
+                    </span>
+                    {diaspora && <Check className="w-4 h-4 text-cyan-400 shrink-0" />}
+                  </button>
+                ) : (
+                  <Link
+                    href="/profile/edit"
+                    onClick={() => setOpen(false)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors border-t border-white/5"
+                  >
+                    <span className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                      <Plane className="w-4 h-4 text-white/40" />
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-sm font-semibold text-white/80">Mode Diaspora</span>
+                      <span className="block text-[11px] text-white/40">Ajoute ta ville d&apos;origine</span>
+                    </span>
+                  </Link>
+                )}
+
+                <p className="px-4 py-2.5 text-[11px] text-white/30 border-t border-white/5 leading-relaxed">
+                  Retrouve les events de chez toi, où que tu sois.
+                </p>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-2.5">

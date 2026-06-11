@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Ticket } from 'lucide-react'
 import type { ExternalEvent } from '@/lib/types'
 import ExternalEventCard from '@/components/ExternalEventCard'
+import { useLocation } from '@/components/LocationProvider'
 
 type State = 'loading' | 'ready' | 'empty'
 
@@ -24,9 +25,11 @@ interface Props {
 export default function ExternalEventsRow({ endpoint, title, source }: Props) {
   const [events, setEvents] = useState<ExternalEvent[]>([])
   const [state, setState]   = useState<State>('loading')
+  const { activeCity, activeCountry } = useLocation()
 
   useEffect(() => {
     let active = true
+    setState('loading')
 
     async function load(city: string, countryCode: string) {
       try {
@@ -44,13 +47,10 @@ export default function ExternalEventsRow({ endpoint, title, source }: Props) {
       }
     }
 
-    fetch('https://ipapi.co/json/')
-      .then((r) => r.json())
-      .then((geo) => load(geo.city ?? 'Dakar', geo.country_code ?? ''))
-      .catch(() => load('Dakar', 'SN'))
+    load(activeCity || 'Dakar', activeCountry)
 
     return () => { active = false }
-  }, [endpoint])
+  }, [endpoint, activeCity, activeCountry])
 
   // Graceful fallback: render nothing if no external events for this city
   if (state === 'empty') return null

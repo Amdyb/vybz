@@ -7,6 +7,7 @@ import EventCard from '@/components/EventCard'
 import ExternalEventCard from '@/components/ExternalEventCard'
 import CategoryFilter from '@/components/CategoryFilter'
 import type { EventWithVenue, ExternalEvent } from '@/lib/types'
+import { useLocation } from '@/components/LocationProvider'
 
 type Tab = 'vybz' | 'externes'
 
@@ -22,7 +23,7 @@ export default function EventsPage() {
   // External (Ticketmaster) state
   const [external, setExternal]       = useState<ExternalEvent[]>([])
   const [extLoading, setExtLoading]   = useState(false)
-  const [extLoaded, setExtLoaded]     = useState(false)
+  const { activeCity, activeCountry } = useLocation()
 
   useEffect(() => {
     async function load() {
@@ -78,9 +79,9 @@ export default function EventsPage() {
     setFiltered(category === 'Tout' ? events : events.filter((e) => e.category === category))
   }, [category, events])
 
-  // Lazy-load external events the first time the Externes tab is opened
+  // Lazy-load external events when the Externes tab is open (and refetch on city change)
   useEffect(() => {
-    if (tab !== 'externes' || extLoaded) return
+    if (tab !== 'externes') return
     setExtLoading(true)
 
     async function fetchExternal(city: string, countryCode: string) {
@@ -103,15 +104,11 @@ export default function EventsPage() {
         setExternal([])
       } finally {
         setExtLoading(false)
-        setExtLoaded(true)
       }
     }
 
-    fetch('https://ipapi.co/json/')
-      .then((r) => r.json())
-      .then((geo) => fetchExternal(geo.city ?? 'Dakar', geo.country_code ?? ''))
-      .catch(() => fetchExternal('Dakar', 'SN'))
-  }, [tab, extLoaded])
+    fetchExternal(activeCity || 'Dakar', activeCountry)
+  }, [tab, activeCity, activeCountry])
 
   return (
     <div className="px-4 md:px-8 py-6">

@@ -10,6 +10,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import type { EventWithVenue } from '@/lib/types'
 import { formatDate, formatTime, formatPrice, getVibe } from '@/lib/utils'
+import { useLocation } from '@/components/LocationProvider'
 
 type Phase = 'idle' | 'rolling' | 'result'
 
@@ -18,8 +19,8 @@ const TOP_POOL = 8
 
 export default function SurprisePage() {
   const router = useRouter()
+  const { activeCity, diaspora } = useLocation()
   const [loading, setLoading]   = useState(true)
-  const [city, setCity]         = useState('')
   const [events, setEvents]     = useState<EventWithVenue[]>([])
   const [goingCounts, setGoingCounts] = useState<Record<string, number>>({})
   const [vibeCounts, setVibeCounts]   = useState<Record<string, number>>({})
@@ -63,11 +64,6 @@ export default function SurprisePage() {
       setLoading(false)
     }
     load()
-
-    fetch('https://ipapi.co/json/')
-      .then((r) => r.json())
-      .then((d) => { if (d.city) setCity(d.city) })
-      .catch(() => {})
   }, [today])
 
   useEffect(() => () => { if (rollTimer.current) clearInterval(rollTimer.current) }, [])
@@ -88,14 +84,14 @@ export default function SurprisePage() {
   // Candidate pool: prefer events in the user's city; fall back to everything.
   const candidates = (() => {
     if (!events.length) return []
-    const inCity = city
-      ? events.filter((e) => e.city?.toLowerCase() === city.toLowerCase())
+    const inCity = activeCity
+      ? events.filter((e) => e.city?.toLowerCase() === activeCity.toLowerCase())
       : []
     const pool = inCity.length ? inCity : events
     return [...pool].sort((a, b) => scoreOf(b) - scoreOf(a)).slice(0, TOP_POOL)
   })()
 
-  const usingCityPool = !!city && events.some((e) => e.city?.toLowerCase() === city.toLowerCase())
+  const usingCityPool = !!activeCity && events.some((e) => e.city?.toLowerCase() === activeCity.toLowerCase())
 
   // ── The surprise roll ─────────────────────────────────────────────────────
   const surprise = useCallback(() => {
@@ -144,7 +140,8 @@ export default function SurprisePage() {
             Surprise Me
           </h1>
           <p className="text-zinc-400 text-sm">
-            Un tap, le meilleur plan {usingCityPool ? <>à <span className="text-white/80 font-semibold">{city}</span></> : 'près de toi'} maintenant.
+            Un tap, le meilleur plan {usingCityPool ? <>à <span className="text-white/80 font-semibold">{activeCity}</span></> : 'près de toi'} maintenant.
+            {diaspora && <span className="block text-cyan-400/80 text-xs mt-0.5">Mode Diaspora actif</span>}
           </p>
         </div>
 

@@ -1,9 +1,10 @@
 import Navbar from '@/components/Navbar'
 import AppFooterLinks from '@/components/legal/AppFooterLinks'
+import { LocationProvider } from '@/components/LocationProvider'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <LocationProvider>
       <Navbar />
       <main className="pb-24 md:pb-8">
         {children}
@@ -14,6 +15,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           Powered by AMDY LABS
         </p>
       </footer>
-    </>
+    </LocationProvider>
   )
 }
