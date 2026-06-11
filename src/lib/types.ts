@@ -22,6 +22,8 @@ export type Database = {
       crew_members:     { Row: CrewMember }
       drops:            { Row: Drop }
       drop_claims:      { Row: DropClaim }
+      rewards:          { Row: Reward }
+      reward_claims:    { Row: RewardClaim }
     }
   }
 }
@@ -247,6 +249,46 @@ export type EventAttendance = {
   event_id: string
   status: 'going' | 'interested'
   created_at: string
+}
+
+export type RewardTier = 'all' | 'neon' | 'gold' | 'diamond'
+
+export type Reward = {
+  id: string
+  organizer_id: string
+  event_id: string | null
+  title: string
+  description: string | null
+  points_required: number
+  quantity_available: number
+  quantity_claimed: number
+  tier_required: RewardTier
+  is_active: boolean
+  expires_at: string | null
+  created_at: string | null
+}
+
+export type RewardClaim = {
+  id: string
+  user_id: string
+  reward_id: string
+  qr_token: string
+  status: 'claimed' | 'redeemed' | 'expired'
+  claimed_at: string | null
+  redeemed_at: string | null
+  created_at: string | null
+}
+
+/** Reward joined with its organizer profile (+ optional event), for the /rewards list. */
+export type RewardWithOrg = Reward & {
+  profiles: Pick<Profile, 'id' | 'full_name' | 'business_name' | 'avatar_url'> | null
+  events: Pick<Event, 'id' | 'title'> | null
+}
+
+/** A user's claim joined with the reward (+ organizer), for profile/tickets. */
+export type RewardClaimWithReward = RewardClaim & {
+  rewards: (Pick<Reward, 'id' | 'title' | 'description' | 'points_required' | 'expires_at'>
+    & { profiles: Pick<Profile, 'full_name' | 'business_name'> | null; events: Pick<Event, 'title'> | null }) | null
 }
 
 export type DropTier = 'all' | 'neon' | 'gold' | 'diamond'

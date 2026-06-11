@@ -6,14 +6,15 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
   MapPin, Pencil, Trophy, Zap, ChevronRight,
-  Calendar, Star, ImageIcon, Loader2, MessageSquare, BadgeCheck, Users,
+  Calendar, Star, ImageIcon, Loader2, MessageSquare, BadgeCheck, Users, Gift,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import type { Profile, EventWithVenue } from '@/lib/types'
+import type { Profile, EventWithVenue, RewardClaimWithReward } from '@/lib/types'
 import { getInitials, getTier, getTierProgress, CATEGORY_COLORS } from '@/lib/utils'
 import EventCard from '@/components/EventCard'
 import FollowButton from '@/components/FollowButton'
 import FollowListModal from '@/components/FollowListModal'
+import RewardClaimCard from '@/components/RewardClaimCard'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -49,7 +50,7 @@ type PhotoRow = {
   created_at: string
 }
 
-type TabKey = 'events' | 'reviews' | 'photos'
+type TabKey = 'events' | 'reviews' | 'photos' | 'rewards'
 type FollowModal = 'followers' | 'following' | null
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -62,6 +63,7 @@ export default function ProfileView({ profile, isOwn, currentUserId }: Props) {
   const [attendance, setAttendance] = useState<AttendanceRow[]>([])
   const [reviews, setReviews] = useState<ReviewRow[]>([])
   const [photos, setPhotos]   = useState<PhotoRow[]>([])
+  const [rewardClaims, setRewardClaims] = useState<RewardClaimWithReward[]>([])
   const [tab, setTab]         = useState<TabKey>('events')
   const [loading, setLoading] = useState(true)
   const [followModal, setFollowModal] = useState<FollowModal>(null)
@@ -121,10 +123,20 @@ export default function ProfileView({ profile, isOwn, currentUserId }: Props) {
       setReviews((reviewsRes.data ?? []) as unknown as ReviewRow[])
       setPhotos((photosRes.data ?? []) as PhotoRow[])
       setLoading(false)
+
+      // My Rewards — only on your own profile (QR codes are private)
+      if (isOwn) {
+        const { data: claims } = await supabase
+          .from('reward_claims')
+          .select('*, rewards(id, title, description, points_required, expires_at, profiles(full_name, business_name), events(title))')
+          .eq('user_id', uid)
+          .order('claimed_at', { ascending: false })
+        if (active) setRewardClaims((claims ?? []) as unknown as RewardClaimWithReward[])
+      }
     }
     load()
     return () => { active = false }
-  }, [uid, profile.pulse_points])
+  }, [uid, profile.pulse_points, isOwn])
 
   const startConversation = useCallback(async () => {
     if (!currentUserId) { router.push('/sign-in'); return }
@@ -329,10 +341,11 @@ export default function ProfileView({ profile, isOwn, currentUserId }: Props) {
 
       {/* ── Tabs ──────────────────────────────────────────────────────── */}
       <div className="bg-zinc-900 border border-purple-900/30 rounded-[2rem] p-2">
-        <div className="grid grid-cols-3 gap-1">
+        <div className={`grid gap-1 ${isOwn ? 'grid-cols-4' : 'grid-cols-3'}`}>
           <TabButton active={tab === 'events'}  onClick={() => setTab('events')}  icon={Calendar}  label="Événements" />
           <TabButton active={tab === 'reviews'} onClick={() => setTab('reviews')} icon={Star}      label="Avis" />
           <TabButton active={tab === 'photos'}  onClick={() => setTab('photos')}  icon={ImageIcon} label="Photos" />
+          {isOwn && <TabButton active={tab === 'rewards'} onClick={() => setTab('rewards')} icon={Gift} label="Récompenses" />}
         </div>
       </div>
 
@@ -407,6 +420,27 @@ export default function ProfileView({ profile, isOwn, currentUserId }: Props) {
               </div>
             ) : (
               <EmptyState icon={ImageIcon} text={isOwn ? "Vous n'avez pas encore publié de photos." : "Aucune photo pour le moment."} />
+            )
+          )}
+
+          {tab === 'rewards' && isOwn && (
+            rewardClaims.length > 0 ? (
+              <div className="space-y-3">
+                {rewardClaims.filter((c) => c.rewards).map((c) => (
+                  <RewardClaimCard
+                    key={c.id}
+                    title={c.rewards!.title}
+                    organizer={c.rewards!.profiles?.business_name || c.rewards!.profiles?.full_name || null}
+                    eventName={c.rewards!.events?.title ?? null}
+                    qrToken={c.qr_token}
+                    status={c.status}
+                    expiresAt={c.rewards!.expires_at}
+                    pointsRequired={c.rewards!.points_required}
+                  />
+                ))}
+              </div>
+            ) : (
+              <EmptyState icon={Gift} text="Vous n'avez pas encore de récompense. Échangez vos points sur la page Récompenses." />
             )
           )}
         </div>

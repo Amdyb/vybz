@@ -8,7 +8,7 @@ import {
   Ticket, TrendingUp, CalendarCheck, Users,
   PlusCircle, ScanLine, BarChart3,
   CheckCircle2, Loader2, ShieldCheck, Crown, Star,
-  MapPin, Clock, ChevronRight, Zap,
+  MapPin, Clock, ChevronRight, Zap, Gift,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/lib/types'
@@ -198,10 +198,11 @@ export default function EnterpriseDashboardPage() {
       </div>
 
       {/* ── Quick actions ── */}
-      <div className="grid grid-cols-2 gap-2 mb-6">
+      <div className="grid grid-cols-3 gap-2 mb-6">
         {[
-          { label: 'Nouvel événement', icon: PlusCircle,  href: '/enterprise/create-event', color: 'text-purple-400' },
+          { label: 'Nouvel événement', icon: PlusCircle,  href: '/enterprise/create-event',  color: 'text-purple-400' },
           { label: 'Créer un Drop',    icon: Zap,          href: '/enterprise/create-drop',   color: 'text-amber-400' },
+          { label: 'Récompense',       icon: Gift,         href: '/enterprise/create-reward', color: 'text-yellow-400' },
           { label: 'Scanner',          icon: ScanLine,     href: '/enterprise/scanner',       color: 'text-cyan-400' },
           { label: 'Analytiques',      icon: BarChart3,    href: '/enterprise/analytics',     color: 'text-emerald-400' },
         ].map(({ label, icon: Icon, href, color }) => (

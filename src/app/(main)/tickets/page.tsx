@@ -13,9 +13,11 @@ import {
   MessageCircle,
   Loader2,
   ChevronLeft,
+  Gift,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import type { TicketWithDetails } from '@/lib/types'
+import type { TicketWithDetails, RewardClaimWithReward } from '@/lib/types'
+import RewardClaimCard from '@/components/RewardClaimCard'
 import { formatDate, formatTime } from '@/lib/utils'
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
@@ -147,6 +149,8 @@ function TicketCard({ ticket, buyerName }: { ticket: TicketWithDetails; buyerNam
 export default function TicketsPage() {
   const router = useRouter()
   const [tickets, setTickets]   = useState<TicketWithDetails[]>([])
+  const [rewardClaims, setRewardClaims] = useState<RewardClaimWithReward[]>([])
+  const [tab, setTab]           = useState<'billets' | 'recompenses'>('billets')
   const [loading, setLoading]   = useState(true)
   const [userName, setUserName] = useState('Acheteur')
 
@@ -161,7 +165,7 @@ export default function TicketsPage() {
         user.email?.split('@')[0] ||
         'Acheteur'
 
-      const [ticketsRes, profileRes] = await Promise.all([
+      const [ticketsRes, profileRes, rewardsRes] = await Promise.all([
         supabase
           .from('tickets')
           .select(`
@@ -178,7 +182,14 @@ export default function TicketsPage() {
           .select('*')
           .eq('id', user.id)
           .maybeSingle(),
+        supabase
+          .from('reward_claims')
+          .select('*, rewards(id, title, description, points_required, expires_at, profiles(full_name, business_name), events(title))')
+          .eq('user_id', user.id)
+          .order('claimed_at', { ascending: false }),
       ])
+
+      setRewardClaims((rewardsRes.data ?? []) as unknown as RewardClaimWithReward[])
 
       const profileData = profileRes.data as { full_name?: string | null } | null
       if (profileData?.full_name) {
@@ -223,13 +234,69 @@ export default function TicketsPage() {
             Mes Billets
           </h1>
           <p className="text-zinc-500 text-xs">
-            {tickets.length} {tickets.length === 1 ? 'billet' : 'billets'}
+            {tickets.length} {tickets.length === 1 ? 'billet' : 'billets'} · {rewardClaims.length} récompense{rewardClaims.length > 1 ? 's' : ''}
           </p>
         </div>
       </div>
 
-      {/* Empty state */}
-      {tickets.length === 0 ? (
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => setTab('billets')}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all active:scale-95 ${
+            tab === 'billets'
+              ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white'
+              : 'bg-zinc-900 border border-purple-900/30 text-white/50 hover:text-white/80'
+          }`}
+        >
+          <TicketIcon className="w-4 h-4" /> Billets
+        </button>
+        <button
+          onClick={() => setTab('recompenses')}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition-all active:scale-95 ${
+            tab === 'recompenses'
+              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black'
+              : 'bg-zinc-900 border border-amber-900/30 text-white/50 hover:text-white/80'
+          }`}
+        >
+          <Gift className="w-4 h-4" /> Récompenses
+        </button>
+      </div>
+
+      {/* ── Récompenses tab ── */}
+      {tab === 'recompenses' && (
+        rewardClaims.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-amber-900/30 flex items-center justify-center mb-4">
+              <Gift className="w-8 h-8 text-amber-400/50" />
+            </div>
+            <h2 className="text-white font-bold mb-2">Aucune récompense</h2>
+            <p className="text-zinc-500 text-sm max-w-xs">Échange tes Pulse Points contre des récompenses exclusives.</p>
+            <Link href="/rewards" className="mt-6 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-sm font-bold px-6 py-2.5 rounded-full hover:opacity-90 transition-opacity">
+              Voir les récompenses
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {rewardClaims.filter((c) => c.rewards).map((c) => (
+              <RewardClaimCard
+                key={c.id}
+                title={c.rewards!.title}
+                organizer={c.rewards!.profiles?.business_name || c.rewards!.profiles?.full_name || null}
+                eventName={c.rewards!.events?.title ?? null}
+                qrToken={c.qr_token}
+                status={c.status}
+                expiresAt={c.rewards!.expires_at}
+                pointsRequired={c.rewards!.points_required}
+              />
+            ))}
+          </div>
+        )
+      )}
+
+      {/* ── Billets tab ── */}
+      {tab === 'billets' && (
+      tickets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-purple-900/30 flex items-center justify-center mb-4">
             <TicketIcon className="w-8 h-8 text-purple-400/50" />
@@ -251,18 +318,21 @@ export default function TicketsPage() {
             <TicketCard key={ticket.id} ticket={ticket} buyerName={userName} />
           ))}
         </div>
+      )
       )}
 
-      {/* WhatsApp delivery note */}
-      <div className="mt-8 px-4 py-4 rounded-2xl bg-zinc-900/60 border border-purple-900/20 flex items-start gap-3">
-        <MessageCircle className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
-        <p className="text-zinc-400 text-xs leading-relaxed">
-          Votre ticket vous sera envoyé sur{' '}
-          <span className="text-green-400 font-semibold">WhatsApp</span>{' '}
-          après confirmation de paiement par l&apos;organisateur.
-          Le paiement et la livraison des billets sont gérés directement par l&apos;organisateur.
-        </p>
-      </div>
+      {/* WhatsApp delivery note — billets only */}
+      {tab === 'billets' && (
+        <div className="mt-8 px-4 py-4 rounded-2xl bg-zinc-900/60 border border-purple-900/20 flex items-start gap-3">
+          <MessageCircle className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
+          <p className="text-zinc-400 text-xs leading-relaxed">
+            Votre ticket vous sera envoyé sur{' '}
+            <span className="text-green-400 font-semibold">WhatsApp</span>{' '}
+            après confirmation de paiement par l&apos;organisateur.
+            Le paiement et la livraison des billets sont gérés directement par l&apos;organisateur.
+          </p>
+        </div>
+      )}
 
       <div className="h-4" />
     </div>
