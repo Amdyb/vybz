@@ -152,6 +152,7 @@ const ACTION_LABELS: Record<string, { label: string; icon: React.ElementType; co
   referral:  { label: 'Parrainage',              icon: Users,         color: 'text-emerald-400' },
   follow:    { label: 'Abonnement organisateur', icon: Star,          color: 'text-purple-300' },
   crew:      { label: 'Crew créé',              icon: Users,          color: 'text-violet-400' },
+  crew_invite:{ label: 'Membre ajouté au crew', icon: Users,          color: 'text-violet-300' },
   birthday:  { label: 'Anniversaire',           icon: Gift,           color: 'text-rose-400' },
   drops:     { label: 'Achat VYBZ Drops',       icon: Zap,            color: 'text-cyan-300' },
   profile:   { label: 'Profil complété',        icon: CheckCircle2,   color: 'text-emerald-400' },

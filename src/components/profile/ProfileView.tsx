@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
   MapPin, Pencil, Trophy, Zap, ChevronRight,
-  Calendar, Star, ImageIcon, Loader2, MessageSquare, BadgeCheck,
+  Calendar, Star, ImageIcon, Loader2, MessageSquare, BadgeCheck, Users,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { Profile, EventWithVenue } from '@/lib/types'
@@ -292,6 +292,23 @@ export default function ProfileView({ profile, isOwn, currentUserId }: Props) {
           </Link>
         )}
       </div>
+
+      {/* ── My Crews entry ────────────────────────────────────────────── */}
+      {isOwn && (
+        <Link
+          href="/crews"
+          className="flex items-center gap-3 bg-zinc-900 border border-purple-900/30 rounded-[2rem] p-4 hover:border-fuchsia-500/30 active:scale-[0.99] transition-all"
+        >
+          <span className="w-11 h-11 rounded-2xl bg-gradient-to-br from-fuchsia-500/20 to-cyan-400/20 border border-fuchsia-500/30 flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5 text-fuchsia-300" />
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-white font-bold text-sm">Mes Crews</span>
+            <span className="block text-zinc-500 text-xs">Crée ta squad, planifie vos sorties</span>
+          </span>
+          <ChevronRight className="w-4 h-4 text-white/30 shrink-0" />
+        </Link>
+      )}
 
       {/* ── Tabs ──────────────────────────────────────────────────────── */}
       <div className="bg-zinc-900 border border-purple-900/30 rounded-[2rem] p-2">

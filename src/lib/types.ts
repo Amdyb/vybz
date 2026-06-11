@@ -18,6 +18,8 @@ export type Database = {
       checkins:         { Row: CheckIn }
       conversations:    { Row: Conversation }
       messages:         { Row: Message }
+      crews:            { Row: Crew }
+      crew_members:     { Row: CrewMember }
     }
   }
 }
@@ -243,6 +245,27 @@ export type EventAttendance = {
   event_id: string
   status: 'going' | 'interested'
   created_at: string
+}
+
+export type Crew = {
+  id: string
+  name: string
+  description: string | null
+  owner_id: string
+  created_at: string | null
+}
+
+export type CrewMember = {
+  id: string
+  crew_id: string
+  user_id: string
+  role: string                       // 'owner' | 'member'
+  joined_at: string | null
+}
+
+/** Crew member row joined with the member's profile (for avatars/names). */
+export type CrewMemberWithProfile = CrewMember & {
+  profiles: Pick<Profile, 'id' | 'full_name' | 'username' | 'avatar_url'> | null
 }
 
 export type Story = {
