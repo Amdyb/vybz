@@ -111,6 +111,14 @@ export function getTier(points: number): Tier {
   }
 }
 
+/** Minimum Pulse Points a VYBZ Drop tier requires, and its display label. */
+export const DROP_TIER_MIN: Record<'all' | 'neon' | 'gold' | 'diamond', number> = {
+  all: 0, neon: 0, gold: 500, diamond: 2000,
+}
+export const DROP_TIER_LABEL: Record<'all' | 'neon' | 'gold' | 'diamond', string> = {
+  all: 'Tous', neon: 'Neon', gold: 'Gold', diamond: 'Diamond',
+}
+
 export function getTierProgress(points: number, tier: Tier): number {
   if (!tier.nextAt) return 100
   const range = tier.nextAt - tier.prevAt

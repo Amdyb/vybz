@@ -20,6 +20,8 @@ export type Database = {
       messages:         { Row: Message }
       crews:            { Row: Crew }
       crew_members:     { Row: CrewMember }
+      drops:            { Row: Drop }
+      drop_claims:      { Row: DropClaim }
     }
   }
 }
@@ -245,6 +247,38 @@ export type EventAttendance = {
   event_id: string
   status: 'going' | 'interested'
   created_at: string
+}
+
+export type DropTier = 'all' | 'neon' | 'gold' | 'diamond'
+
+export type Drop = {
+  id: string
+  event_id: string | null
+  venue_id: string | null
+  original_price: number | null
+  drop_price: number | null
+  discount_percent: number | null
+  currency: string | null
+  quantity_available: number
+  quantity_claimed: number
+  starts_at: string
+  expires_at: string
+  min_tier_required: DropTier
+  is_active: boolean
+  created_at: string | null
+}
+
+export type DropClaim = {
+  id: string
+  drop_id: string
+  user_id: string
+  created_at: string | null
+}
+
+/** Drop joined with its event (+ venue) for the cards. */
+export type DropWithEvent = Drop & {
+  events: (Pick<Event, 'id' | 'title' | 'cover_image' | 'event_date' | 'start_time' | 'category' | 'city'>
+    & { venues: Pick<Venue, 'name' | 'city'> | null }) | null
 }
 
 export type Crew = {

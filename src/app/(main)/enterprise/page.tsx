@@ -198,11 +198,12 @@ export default function EnterpriseDashboardPage() {
       </div>
 
       {/* ── Quick actions ── */}
-      <div className="grid grid-cols-3 gap-2 mb-6">
+      <div className="grid grid-cols-2 gap-2 mb-6">
         {[
           { label: 'Nouvel événement', icon: PlusCircle,  href: '/enterprise/create-event', color: 'text-purple-400' },
+          { label: 'Créer un Drop',    icon: Zap,          href: '/enterprise/create-drop',   color: 'text-amber-400' },
           { label: 'Scanner',          icon: ScanLine,     href: '/enterprise/scanner',       color: 'text-cyan-400' },
-          { label: 'Analytiques',      icon: BarChart3,    href: '/enterprise/analytics',     color: 'text-amber-400' },
+          { label: 'Analytiques',      icon: BarChart3,    href: '/enterprise/analytics',     color: 'text-emerald-400' },
         ].map(({ label, icon: Icon, href, color }) => (
           <Link
             key={label}

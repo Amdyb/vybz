@@ -310,6 +310,23 @@ export default function ProfileView({ profile, isOwn, currentUserId }: Props) {
         </Link>
       )}
 
+      {/* ── VYBZ Drops entry ──────────────────────────────────────────── */}
+      {isOwn && (
+        <Link
+          href="/drops"
+          className="flex items-center gap-3 bg-zinc-900 border border-amber-900/30 rounded-[2rem] p-4 hover:border-amber-500/40 active:scale-[0.99] transition-all"
+        >
+          <span className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500/25 to-yellow-400/20 border border-amber-500/40 flex items-center justify-center shrink-0">
+            <Zap className="w-5 h-5 text-amber-400 fill-amber-400" />
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-white font-bold text-sm">VYBZ Drops</span>
+            <span className="block text-zinc-500 text-xs">Offres flash exclusives, durée limitée</span>
+          </span>
+          <ChevronRight className="w-4 h-4 text-white/30 shrink-0" />
+        </Link>
+      )}
+
       {/* ── Tabs ──────────────────────────────────────────────────────── */}
       <div className="bg-zinc-900 border border-purple-900/30 rounded-[2rem] p-2">
         <div className="grid grid-cols-3 gap-1">
