@@ -87,6 +87,7 @@ export type Profile = {
   is_verified_organizer: boolean | null
   is_organizer: boolean | null
   organizer_preferences: OrganizerPreferences | null
+  user_preferences: UserPreferences | null
   favorite_categories: string[] | null
   pulse_points: number | null
   events_attended: number | null
@@ -104,6 +105,13 @@ export type OrganizerPreferences = {
     whatsapp: string | null
     website: string | null
   }
+}
+
+export type UserPreferences = {
+  home_city: string | null          // powers Diaspora Mode
+  music_genres: string[]
+  going_out_frequency: string | null
+  preferred_nights: string[]
 }
 
 export type Favorite = {

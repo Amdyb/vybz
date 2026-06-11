@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  ChevronLeft, Star, Zap, Lock, CheckCircle2,
+  ChevronLeft, Star, Zap, Lock, CheckCircle2, Sparkles,
   Loader2, TrendingUp, Ticket, Heart, MessageSquare,
   Users, Camera, Sun, Gift, Crown, CalendarCheck,
   ArrowUpRight, ArrowDownLeft, Clock,
@@ -155,6 +155,7 @@ const ACTION_LABELS: Record<string, { label: string; icon: React.ElementType; co
   birthday:  { label: 'Anniversaire',           icon: Gift,           color: 'text-rose-400' },
   drops:     { label: 'Achat VYBZ Drops',       icon: Zap,            color: 'text-cyan-300' },
   profile:   { label: 'Profil complété',        icon: CheckCircle2,   color: 'text-emerald-400' },
+  onboarding:{ label: 'Onboarding complété',    icon: Sparkles,       color: 'text-fuchsia-400' },
   redeem:    { label: 'Récompense échangée',    icon: Gift,           color: 'text-amber-400' },
 }
 

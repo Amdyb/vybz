@@ -44,7 +44,7 @@ export default function ProfilePage() {
           username: null, bio: null, avatar_url: null,
           city: null, country: null, language: null, role: 'user',
           business_name: null, subscription_plan: 'basic', is_verified_organizer: false,
-          is_organizer: false, organizer_preferences: null,
+          is_organizer: false, organizer_preferences: null, user_preferences: null,
           favorite_categories: [], pulse_points: 0, events_attended: 0, reviews_count: 0,
           created_at: null,
         })
