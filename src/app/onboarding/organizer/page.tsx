@@ -51,11 +51,25 @@ export default function OrganizerOnboardingPage() {
   const [website, setWebsite]               = useState('')
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.replace('/sign-in'); return }
+
+      // Already onboarded as organizer → skip straight to the dashboard
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_organizer')
+        .eq('id', user.id)
+        .maybeSingle()
+      if ((profile as { is_organizer: boolean | null } | null)?.is_organizer) {
+        router.replace('/enterprise')
+        return
+      }
+
       setUserId(user.id)
       setLoading(false)
-    })
+    }
+    load()
   }, [router])
 
   function togglePayment(method: string) {
