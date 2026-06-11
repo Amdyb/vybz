@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import Link from 'next/link'
+import { Sparkles } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { EventWithVenue } from '@/lib/types'
 import CityHeader from './CityHeader'
@@ -201,6 +203,15 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
           className="flex gap-2 overflow-x-auto px-4 pb-1"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
+          {/* Surprise Me — one tap to the best plan near you */}
+          <Link
+            href="/surprise"
+            className="shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold border border-transparent bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-[0_0_14px_rgba(217,70,239,0.45)] active:scale-95 transition-all"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Surprise Me
+          </Link>
+
           {FILTER_CHIPS.map((f) => (
             <button
               key={f.value}
