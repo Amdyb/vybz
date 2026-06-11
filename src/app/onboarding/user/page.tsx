@@ -10,22 +10,10 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { UserPreferences } from '@/lib/types'
-import { USER_CATEGORIES, CATEGORY_COLORS } from '@/lib/utils'
-
-const MUSIC_GENRES = [
-  'Afrobeats', 'Amapiano', 'Hip-Hop', 'R&B', 'Mbalax', 'Dancehall',
-  'House', 'Afro House', 'Techno', 'Reggae', 'Jazz', 'Pop',
-  'Coupé-Décalé', 'Salsa',
-]
-
-const GOING_OUT = [
-  'Tous les weekends',
-  'Quelques fois par mois',
-  'De temps en temps',
-  'Pour les grands événements',
-]
-
-const NIGHTS = ['Jeudi', 'Vendredi', 'Samedi', 'Dimanche', 'En semaine']
+import {
+  USER_CATEGORIES, CATEGORY_COLORS,
+  MUSIC_GENRES, GOING_OUT_FREQUENCIES, PREFERRED_NIGHTS,
+} from '@/lib/utils'
 
 const TOTAL_STEPS = 4
 
@@ -286,7 +274,7 @@ export default function UserOnboardingPage() {
               <div>
                 <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3 block">À quelle fréquence sors-tu ?</label>
                 <div className="grid grid-cols-1 gap-2.5">
-                  {GOING_OUT.map((opt) => {
+                  {GOING_OUT_FREQUENCIES.map((opt) => {
                     const active = frequency === opt
                     return (
                       <button
@@ -314,7 +302,7 @@ export default function UserOnboardingPage() {
                   Tes soirs préférés <span className="text-zinc-600 normal-case">(optionnel)</span>
                 </label>
                 <div className="flex flex-wrap gap-2.5">
-                  {NIGHTS.map((nightOpt) => {
+                  {PREFERRED_NIGHTS.map((nightOpt) => {
                     const active = nights.includes(nightOpt)
                     return (
                       <button

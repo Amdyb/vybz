@@ -5,11 +5,14 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  ArrowLeft, Camera, Loader2, Check, AlertCircle, MapPin,
+  ArrowLeft, Camera, Loader2, Check, AlertCircle, MapPin, Globe,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import type { Profile } from '@/lib/types'
-import { getInitials, USER_CATEGORIES, CATEGORY_COLORS } from '@/lib/utils'
+import type { Profile, UserPreferences } from '@/lib/types'
+import {
+  getInitials, USER_CATEGORIES, CATEGORY_COLORS,
+  MUSIC_GENRES, GOING_OUT_FREQUENCIES, PREFERRED_NIGHTS,
+} from '@/lib/utils'
 
 const BIO_MAX = 150
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/
@@ -31,6 +34,12 @@ export default function EditProfilePage() {
   const [bio, setBio]             = useState('')
   const [city, setCity]           = useState('')
   const [categories, setCategories] = useState<string[]>([])
+
+  // New preferences (user_preferences jsonb)
+  const [homeCity, setHomeCity]   = useState('')
+  const [genres, setGenres]       = useState<string[]>([])
+  const [frequency, setFrequency] = useState('')
+  const [nights, setNights]       = useState<string[]>([])
 
   // Avatar
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
@@ -62,6 +71,12 @@ export default function EditProfilePage() {
       setCity(p?.city ?? '')
       setCategories(p?.favorite_categories ?? [])
       setAvatarUrl(p?.avatar_url ?? null)
+
+      const prefs = p?.user_preferences
+      setHomeCity(prefs?.home_city ?? '')
+      setGenres(prefs?.music_genres ?? [])
+      setFrequency(prefs?.going_out_frequency ?? '')
+      setNights(prefs?.preferred_nights ?? [])
       setLoading(false)
     }
     load()
@@ -105,6 +120,9 @@ export default function EditProfilePage() {
     )
   }
 
+  const toggle = (set: React.Dispatch<React.SetStateAction<string[]>>) => (item: string) =>
+    set((prev) => prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item])
+
   async function handleSave() {
     if (!userId) return
     setError('')
@@ -145,6 +163,7 @@ export default function EditProfilePage() {
       city: string | null
       favorite_categories: string[]
       avatar_url: string | null
+      user_preferences: UserPreferences
     }
     const payload: ProfileUpdate = {
       id: userId,
@@ -154,6 +173,12 @@ export default function EditProfilePage() {
       city: city.trim() || null,
       favorite_categories: categories,
       avatar_url: newAvatarUrl,
+      user_preferences: {
+        home_city: homeCity.trim() || null,
+        music_genres: genres,
+        going_out_frequency: frequency || null,
+        preferred_nights: nights,
+      },
     }
 
     const { error: saveErr } = await supabase
@@ -319,6 +344,93 @@ export default function EditProfilePage() {
                     }`}
                   >
                     {cat}
+                  </button>
+                )
+              })}
+            </div>
+          </Field>
+
+          {/* Home city (Diaspora Mode) */}
+          <Field label="Ville d'origine">
+            <div className="relative">
+              <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+              <input
+                type="text"
+                value={homeCity}
+                onChange={(e) => setHomeCity(e.target.value)}
+                placeholder="Ex: Abidjan"
+                className="vybz-input pl-10"
+              />
+            </div>
+            <Hint color="text-zinc-600">Pour le Mode Diaspora : les events de chez toi, où que tu sois.</Hint>
+          </Field>
+
+          {/* Music genres */}
+          <Field label="Genres musicaux">
+            <div className="flex flex-wrap gap-2">
+              {MUSIC_GENRES.map((genre) => {
+                const active = genres.includes(genre)
+                return (
+                  <button
+                    key={genre}
+                    type="button"
+                    onClick={() => toggle(setGenres)(genre)}
+                    className={`flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-full border transition-all active:scale-95 ${
+                      active
+                        ? 'bg-fuchsia-500/15 text-fuchsia-200 border-fuchsia-500/40'
+                        : 'bg-zinc-900 text-zinc-500 border-zinc-700/50 hover:border-zinc-600'
+                    }`}
+                  >
+                    {active && <Check className="w-3 h-3" />}
+                    {genre}
+                  </button>
+                )
+              })}
+            </div>
+          </Field>
+
+          {/* Going-out frequency */}
+          <Field label="Fréquence de sortie">
+            <div className="flex flex-wrap gap-2">
+              {GOING_OUT_FREQUENCIES.map((opt) => {
+                const active = frequency === opt
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setFrequency(active ? '' : opt)}
+                    className={`flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-full border transition-all active:scale-95 ${
+                      active
+                        ? 'bg-fuchsia-500/15 text-fuchsia-200 border-fuchsia-500/40'
+                        : 'bg-zinc-900 text-zinc-500 border-zinc-700/50 hover:border-zinc-600'
+                    }`}
+                  >
+                    {active && <Check className="w-3 h-3" />}
+                    {opt}
+                  </button>
+                )
+              })}
+            </div>
+          </Field>
+
+          {/* Preferred nights */}
+          <Field label="Soirs préférés">
+            <div className="flex flex-wrap gap-2">
+              {PREFERRED_NIGHTS.map((nightOpt) => {
+                const active = nights.includes(nightOpt)
+                return (
+                  <button
+                    key={nightOpt}
+                    type="button"
+                    onClick={() => toggle(setNights)(nightOpt)}
+                    className={`flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-full border transition-all active:scale-95 ${
+                      active
+                        ? 'bg-cyan-500/15 text-cyan-200 border-cyan-500/40'
+                        : 'bg-zinc-900 text-zinc-500 border-zinc-700/50 hover:border-zinc-600'
+                    }`}
+                  >
+                    {active && <Check className="w-3 h-3" />}
+                    {nightOpt}
                   </button>
                 )
               })}

@@ -18,6 +18,22 @@ export const CATEGORIES = ['Tout', 'Nightlife', 'Jazz', 'Culture', 'Rooftop', 'U
 /** Categories a user can pick as favourites (no "Tout"). */
 export const USER_CATEGORIES = ['Nightlife', 'Jazz', 'Culture', 'Rooftop', 'Underground'] as const
 
+// Onboarding survey + profile preferences (shared by /onboarding/user and /profile/edit)
+export const MUSIC_GENRES = [
+  'Afrobeats', 'Amapiano', 'Hip-Hop', 'R&B', 'Mbalax', 'Dancehall',
+  'House', 'Afro House', 'Techno', 'Reggae', 'Jazz', 'Pop',
+  'Coupé-Décalé', 'Salsa',
+] as const
+
+export const GOING_OUT_FREQUENCIES = [
+  'Tous les weekends',
+  'Quelques fois par mois',
+  'De temps en temps',
+  'Pour les grands événements',
+] as const
+
+export const PREFERRED_NIGHTS = ['Jeudi', 'Vendredi', 'Samedi', 'Dimanche', 'En semaine'] as const
+
 /** Two-letter initials from a display name, for avatar fallbacks. */
 export function getInitials(name: string): string {
   return name
