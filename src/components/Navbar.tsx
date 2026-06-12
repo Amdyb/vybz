@@ -79,7 +79,7 @@ export default function Navbar() {
       {/* ── Desktop top bar ── */}
       <header className="hidden md:flex items-center justify-between px-8 border-b border-white/5 bg-black sticky top-0 z-50" style={{ minHeight: 60 }}>
         <Link href="/" className="flex items-center">
-          <Image src="/vybz-logo.webp" alt="VYBZ" height={60} width={60} className="h-[60px] w-auto" priority />
+          <Image src="/vybz-logo.svg" alt="VYBZ" unoptimized height={48} width={48} className="h-12 w-auto" priority />
         </Link>
 
         <div className="flex items-center gap-1">

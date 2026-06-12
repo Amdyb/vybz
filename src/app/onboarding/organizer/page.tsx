@@ -162,7 +162,7 @@ export default function OrganizerOnboardingPage() {
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <Link href="/">
-            <Image src="/vybz-logo.webp" alt="VYBZ" width={56} height={56} className="h-14 w-auto" priority />
+            <Image src="/vybz-logo.svg" alt="VYBZ" unoptimized width={56} height={56} className="h-14 w-auto" priority />
           </Link>
         </div>
 

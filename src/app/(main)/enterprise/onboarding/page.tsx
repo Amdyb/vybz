@@ -157,7 +157,7 @@ export default function EnterpriseOnboardingPage() {
       {/* Logo */}
       <div className="flex justify-center mb-8">
         <Link href="/">
-          <Image src="/vybz-logo.webp" alt="VYBZ" width={64} height={64} className="h-16 w-auto" />
+          <Image src="/vybz-logo.svg" alt="VYBZ" unoptimized width={64} height={64} className="h-16 w-auto" />
         </Link>
       </div>
 

@@ -50,8 +50,8 @@ export default function CityHeader() {
       <div className="flex items-center gap-2.5">
         <Link href="/">
           <Image
-            src="/vybz-logo.webp"
-            alt="VYBZ"
+            src="/vybz-logo.svg"
+            alt="VYBZ" unoptimized
             height={36}
             width={36}
             className="h-9 w-auto"

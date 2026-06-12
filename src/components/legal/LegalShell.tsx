@@ -59,7 +59,7 @@ export default function LegalShell({
         {/* ── Top bar: logo + back + language toggle ── */}
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="flex items-center gap-2 group">
-            <Image src="/vybz-logo.webp" alt="VYBZ" width={48} height={48} className="h-12 w-auto" priority />
+            <Image src="/vybz-logo.svg" alt="VYBZ" unoptimized width={48} height={48} className="h-12 w-auto" priority />
           </Link>
 
           <div className="flex items-center gap-2">
