@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import Link from 'next/link'
-import { Sparkles } from 'lucide-react'
+import { Shuffle } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { EventWithVenue } from '@/lib/types'
+import { useSurprise } from '@/components/surprise/SurpriseProvider'
 import CityHeader from './CityHeader'
 import HeroCarousel from './HeroCarousel'
 import CategoryRow from './CategoryRow'
@@ -73,6 +73,7 @@ interface Props {
 }
 
 export default function HomeClient({ allEvents, heroEvents }: Props) {
+  const { open: openSurprise } = useSurprise()
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all')
   const [orderedIds, setOrderedIds] = useState<CategoryId[]>(
     CATEGORY_GROUPS.map((g) => g.id)
@@ -203,15 +204,6 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
           className="flex gap-2 overflow-x-auto px-4 pb-1"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {/* Surprise Me — one tap to the best plan near you */}
-          <Link
-            href="/surprise"
-            className="shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold border border-transparent bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-[0_0_14px_rgba(217,70,239,0.45)] active:scale-95 transition-all"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Surprise Me
-          </Link>
-
           {FILTER_CHIPS.map((f) => (
             <button
               key={f.value}
@@ -226,6 +218,18 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Surprends-moi — one tap to the best plan near you right now */}
+      <div className="px-4 pt-2 pb-1">
+        <button
+          onClick={openSurprise}
+          className="animate-surprise-glow w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white font-black text-base active:scale-[0.98] transition-transform"
+          style={{ fontFamily: 'Syne, sans-serif' }}
+        >
+          <Shuffle className="w-5 h-5" />
+          Surprends-moi
+        </button>
       </div>
 
       {/* Hero swipeable carousel */}
