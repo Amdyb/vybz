@@ -90,14 +90,16 @@ export default function EventsPage() {
       if (countryCode) params.set('countryCode', countryCode)
 
       try {
-        // Fetch both providers in parallel; each fails soft to an empty list
-        const [tmRes, ebRes] = await Promise.all([
+        // Fetch all providers in parallel; each fails soft to an empty list.
+        // Facebook returns [] until FACEBOOK_ACCESS_TOKEN is set (Meta approval).
+        const [tmRes, ebRes, fbRes] = await Promise.all([
           fetch(`/api/events/ticketmaster?${params.toString()}`).then((r) => r.json()).catch(() => ({ events: [] })),
           fetch(`/api/events/eventbrite?${params.toString()}`).then((r) => r.json()).catch(() => ({ events: [] })),
+          fetch(`/api/events/facebook?${params.toString()}`).then((r) => r.json()).catch(() => ({ events: [] })),
         ]) as { events?: ExternalEvent[] }[]
 
         // Merge and sort by date (events without a date sink to the end)
-        const merged = [...(tmRes.events ?? []), ...(ebRes.events ?? [])]
+        const merged = [...(tmRes.events ?? []), ...(ebRes.events ?? []), ...(fbRes.events ?? [])]
         merged.sort((a, b) => (a.event_date || '9999').localeCompare(b.event_date || '9999'))
         setExternal(merged)
       } catch {
@@ -183,6 +185,8 @@ export default function EventsPage() {
               Via <span className="text-[#026CDF] font-bold">Ticketmaster</span>
               {' · '}
               <span className="text-[#F05537] font-bold">Eventbrite</span>
+              {' · '}
+              <span className="text-[#1877F2] font-bold">Facebook</span>
             </span>
           </div>
 

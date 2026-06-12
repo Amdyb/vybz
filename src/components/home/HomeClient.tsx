@@ -248,6 +248,13 @@ export default function HomeClient({ allEvents, heroEvents }: Props) {
             title="Événements proches de vous"
             source="eventbrite"
           />
+          {/* Facebook — placeholder row, hidden until FACEBOOK_ACCESS_TOKEN is set
+              (the route returns [] without a token and the row hides on empty). */}
+          <ExternalEventsRow
+            endpoint="/api/events/facebook"
+            title="Événements Facebook près de vous"
+            source="facebook"
+          />
         </>
       )}
 

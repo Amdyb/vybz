@@ -21,6 +21,7 @@ function formatExternalPrice(ev: ExternalEvent): string {
 const SOURCE_META: Record<ExternalEvent['source'], { label: string; color: string }> = {
   ticketmaster: { label: 'Ticketmaster', color: 'text-[#026CDF]' },
   eventbrite:   { label: 'Eventbrite',   color: 'text-[#F05537]' },
+  facebook:     { label: 'Facebook',     color: 'text-[#1877F2]' },
 }
 
 export default function ExternalEventCard({ event }: { event: ExternalEvent }) {

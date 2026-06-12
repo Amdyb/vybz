@@ -206,7 +206,7 @@ image host in `next.config.js`.
 - Colors are locked — do not change them
 
 ## LOGO
-- Logo file: /public/vybz-logo.png
+- Logo file: /public/vybz-logo.webp
 - Always use image, never text for the logo
 - Navbar: logo on left, nav links on right
 - Navbar background: black #000000

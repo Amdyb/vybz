@@ -38,7 +38,7 @@ export default function SignInPage() {
         <div className="flex justify-center mb-10">
           <Link href="/">
             <Image
-              src="/vybz-logo.png"
+              src="/vybz-logo.webp"
               alt="VYBZ"
               width={80}
               height={80}

@@ -26,6 +26,19 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'cdn.evbuc.com',
       },
+      {
+        // Facebook event cover images are served from rotating fbcdn subdomains
+        protocol: 'https',
+        hostname: '**.fbcdn.net',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.fbsbx.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'graph.facebook.com',
+      },
     ],
   },
 }

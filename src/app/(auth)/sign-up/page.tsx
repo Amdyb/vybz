@@ -87,7 +87,7 @@ export default function SignUpPage() {
         <div className="w-full max-w-md">
           <div className="flex justify-center mb-8">
             <Link href="/">
-              <Image src="/vybz-logo.png" alt="VYBZ" width={72} height={72} className="h-18 w-auto" priority />
+              <Image src="/vybz-logo.webp" alt="VYBZ" width={72} height={72} className="h-18 w-auto" priority />
             </Link>
           </div>
 
@@ -174,7 +174,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-8">
           <Link href="/">
-            <Image src="/vybz-logo.png" alt="VYBZ" width={72} height={72} className="h-18 w-auto" priority />
+            <Image src="/vybz-logo.webp" alt="VYBZ" width={72} height={72} className="h-18 w-auto" priority />
           </Link>
         </div>
 

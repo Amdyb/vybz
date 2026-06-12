@@ -11,6 +11,7 @@ type State = 'loading' | 'ready' | 'empty'
 const SOURCE_LABEL: Record<ExternalEvent['source'], { name: string; color: string }> = {
   ticketmaster: { name: 'Ticketmaster', color: 'text-[#026CDF]' },
   eventbrite:   { name: 'Eventbrite',   color: 'text-[#F05537]' },
+  facebook:     { name: 'Facebook',     color: 'text-[#1877F2]' },
 }
 
 interface Props {
