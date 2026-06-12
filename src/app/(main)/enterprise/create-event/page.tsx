@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  ChevronLeft, Loader2, CheckCircle2, Upload, X,
+  ChevronLeft, Loader2, CheckCircle2, Check, Upload, X,
   CalendarDays, Clock, MapPin, Tag, AlignLeft,
   Image as ImageIcon, Ticket, Phone, FileText,
   ExternalLink,
@@ -578,7 +578,7 @@ export default function CreateEventPage() {
                           : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-purple-900/50'
                       }`}
                     >
-                      {active && <span className="mr-1">✓</span>}
+                      {active && <Check className="w-3 h-3 inline-block mr-1 -mt-0.5" />}
                       {pm.label}
                     </button>
                   )

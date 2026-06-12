@@ -70,6 +70,10 @@ export default function Navbar() {
   const profileHref   = user ? '/profile' : '/sign-in'
   const profileActive = pathname.startsWith('/profile')
 
+  // Hide the mobile bottom nav inside a 1:1 conversation so it never covers
+  // the chat input bar (the conversation view is a focused full-screen layout).
+  const isConversation = /^\/messages\/[^/]+$/.test(pathname)
+
   return (
     <>
       {/* ── Desktop top bar ── */}
@@ -129,7 +133,8 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* ── Mobile bottom nav ── */}
+      {/* ── Mobile bottom nav (hidden inside a conversation) ── */}
+      {!isConversation && (
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a16]/95 backdrop-blur-xl border-t border-white/5">
         <div className="flex items-center justify-around py-3 px-2">
           {navLinks.map(({ href, label, icon: Icon }) => {
@@ -182,6 +187,7 @@ export default function Navbar() {
           </Link>
         </div>
       </nav>
+      )}
     </>
   )
 }

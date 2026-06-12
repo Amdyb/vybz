@@ -452,45 +452,80 @@ export default function AnalyticsPage() {
                 <p className="text-zinc-500 text-xs">Aucune transaction sur cette période</p>
               </div>
             ) : (
-              <div className="overflow-x-auto -mx-5">
-                <table className="w-full min-w-[520px] text-xs">
-                  <thead>
-                    <tr className="text-zinc-600 uppercase tracking-wider text-[10px]">
-                      {['Réf.', 'Événement', 'Type', 'Montant', 'Date', 'Statut'].map(h => (
-                        <th key={h} className="text-left px-5 pb-3 font-semibold">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {recentTxns.map(tx => (
-                      <tr key={tx.id} className="hover:bg-white/2 transition-colors">
-                        <td className="px-5 py-2.5 font-mono text-zinc-500 text-[10px]">
-                          #{tx.id.slice(0, 8).toUpperCase()}
-                        </td>
-                        <td className="px-5 py-2.5 text-white font-medium max-w-[120px]">
-                          <span className="line-clamp-1">{tx.event?.title ?? '—'}</span>
-                        </td>
-                        <td className="px-5 py-2.5 text-zinc-400">{tx.ticket_types?.name ?? '—'}</td>
-                        <td className="px-5 py-2.5 text-emerald-400 font-bold whitespace-nowrap">
-                          {(tx.total_amount ?? 0).toLocaleString('fr-SN')} {tx.currency ?? 'XOF'}
-                        </td>
-                        <td className="px-5 py-2.5 text-zinc-500 whitespace-nowrap">
-                          {new Date(tx.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
-                        </td>
-                        <td className="px-5 py-2.5">
-                          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
-                            tx.status === 'paid'    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' :
-                            tx.status === 'pending' ? 'bg-amber-500/10  text-amber-400  border-amber-500/30'  :
-                                                      'bg-zinc-700/40   text-zinc-400   border-zinc-700'
-                          }`}>
-                            {tx.status === 'paid' ? 'Payé' : tx.status === 'pending' ? 'En attente' : tx.status ?? '—'}
+              <>
+                {/* Mobile: stacked cards */}
+                <div className="space-y-2.5 sm:hidden">
+                  {recentTxns.map(tx => {
+                    const statusCls =
+                      tx.status === 'paid'    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' :
+                      tx.status === 'pending' ? 'bg-amber-500/10  text-amber-400  border-amber-500/30'  :
+                                                'bg-zinc-700/40   text-zinc-400   border-zinc-700'
+                    const statusLabel = tx.status === 'paid' ? 'Payé' : tx.status === 'pending' ? 'En attente' : tx.status ?? '—'
+                    return (
+                      <div key={tx.id} className="bg-zinc-800/40 rounded-xl p-3">
+                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                          <p className="text-white text-xs font-semibold leading-tight line-clamp-1 flex-1 min-w-0">
+                            {tx.event?.title ?? '—'}
+                          </p>
+                          <span className={`shrink-0 text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border ${statusCls}`}>
+                            {statusLabel}
                           </span>
-                        </td>
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-zinc-500 text-[11px] truncate">
+                            {tx.ticket_types?.name ?? '—'} · {new Date(tx.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                          </span>
+                          <span className="text-emerald-400 text-xs font-bold whitespace-nowrap shrink-0">
+                            {(tx.total_amount ?? 0).toLocaleString('fr-SN')} {tx.currency ?? 'XOF'}
+                          </span>
+                        </div>
+                        <p className="text-zinc-700 text-[9px] font-mono mt-1.5">#{tx.id.slice(0, 8).toUpperCase()}</p>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Tablet/desktop: table */}
+                <div className="hidden sm:block overflow-x-auto -mx-5">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-zinc-600 uppercase tracking-wider text-[10px]">
+                        {['Réf.', 'Événement', 'Type', 'Montant', 'Date', 'Statut'].map(h => (
+                          <th key={h} className="text-left px-5 pb-3 font-semibold">{h}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {recentTxns.map(tx => (
+                        <tr key={tx.id} className="hover:bg-white/2 transition-colors">
+                          <td className="px-5 py-2.5 font-mono text-zinc-500 text-[10px]">
+                            #{tx.id.slice(0, 8).toUpperCase()}
+                          </td>
+                          <td className="px-5 py-2.5 text-white font-medium max-w-[120px]">
+                            <span className="line-clamp-1">{tx.event?.title ?? '—'}</span>
+                          </td>
+                          <td className="px-5 py-2.5 text-zinc-400">{tx.ticket_types?.name ?? '—'}</td>
+                          <td className="px-5 py-2.5 text-emerald-400 font-bold whitespace-nowrap">
+                            {(tx.total_amount ?? 0).toLocaleString('fr-SN')} {tx.currency ?? 'XOF'}
+                          </td>
+                          <td className="px-5 py-2.5 text-zinc-500 whitespace-nowrap">
+                            {new Date(tx.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                          </td>
+                          <td className="px-5 py-2.5">
+                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
+                              tx.status === 'paid'    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' :
+                              tx.status === 'pending' ? 'bg-amber-500/10  text-amber-400  border-amber-500/30'  :
+                                                        'bg-zinc-700/40   text-zinc-400   border-zinc-700'
+                            }`}>
+                              {tx.status === 'paid' ? 'Payé' : tx.status === 'pending' ? 'En attente' : tx.status ?? '—'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </>

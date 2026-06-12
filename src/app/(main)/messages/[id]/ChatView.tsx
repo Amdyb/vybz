@@ -446,7 +446,10 @@ export default function ChatView({ conversationId }: { conversationId: string })
   }
 
   return (
-    <div className="flex flex-col h-[100dvh]">
+    /* Mobile: fixed full-screen overlay (bottom nav is hidden on this route) so the
+       input bar is never covered and the layout footer/padding can't add scroll.
+       Desktop: in-flow below the 60px sticky top bar. */
+    <div className="flex flex-col fixed inset-0 z-40 bg-[#08080F] md:static md:h-[calc(100dvh-60px)]">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5 bg-[#08080F]/95 backdrop-blur-sm shrink-0 sticky top-0 z-10">
         <button onClick={() => router.back()} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors">
