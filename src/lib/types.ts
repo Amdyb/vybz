@@ -24,6 +24,7 @@ export type Database = {
       drop_claims:      { Row: DropClaim }
       rewards:          { Row: Reward }
       reward_claims:    { Row: RewardClaim }
+      subscriptions:    { Row: Subscription }
     }
   }
 }
@@ -90,6 +91,7 @@ export type Profile = {
   role: string | null                  // 'user' | 'organizer' | 'admin'
   business_name: string | null
   subscription_plan: string | null     // 'basic' | 'pro' | 'premium'
+  subscription_expires_at: string | null
   is_verified_organizer: boolean | null
   is_organizer: boolean | null
   organizer_preferences: OrganizerPreferences | null
@@ -249,6 +251,19 @@ export type EventAttendance = {
   event_id: string
   status: 'going' | 'interested'
   created_at: string
+}
+
+export type Subscription = {
+  id: string
+  organizer_id: string
+  plan: 'pro' | 'premium'
+  amount: number
+  currency: string
+  paydunya_token: string | null
+  status: 'pending' | 'completed' | 'failed' | 'cancelled'
+  period_start: string | null
+  period_end: string | null
+  created_at: string | null
 }
 
 export type RewardTier = 'all' | 'neon' | 'gold' | 'diamond'

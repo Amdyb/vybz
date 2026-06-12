@@ -379,13 +379,26 @@ export default function EnterpriseDashboardPage() {
             ))}
           </ul>
           <Link
-            href="/enterprise/onboarding"
+            href="/enterprise/subscription"
             className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold px-5 py-2.5 rounded-full hover:opacity-90 transition-opacity"
           >
             Mettre à niveau
             <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
+      )}
+
+      {/* Manage subscription — for paid plans */}
+      {profile?.subscription_plan && profile.subscription_plan !== 'basic' && (
+        <Link
+          href="/enterprise/subscription"
+          className="flex items-center justify-between gap-2 bg-zinc-900 border border-purple-900/30 rounded-2xl px-4 py-3 mb-4 hover:border-purple-500/30 transition-colors"
+        >
+          <span className="flex items-center gap-2 text-sm text-white/70 font-semibold">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" /> Gérer mon abonnement
+          </span>
+          <ChevronRight className="w-4 h-4 text-white/30" />
+        </Link>
       )}
 
       <div className="h-4" />
